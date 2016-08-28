@@ -51,7 +51,7 @@ switch test
         f0 = normalize( rho + gaussian(.25,.25,sigma) );
         f1 = normalize( rho + gaussian(.75,.75,sigma) );
         epsilon=min(f0(:));
-        
+
     case 'obsession'
         sigma = 0.0354;
         rho = 1e-4; % minimum density value
@@ -63,8 +63,8 @@ switch test
 %          sigma=0.04;
 %              f0 = normalize( rho + gaussian(.2,.2,sigma) );
 %         f1 = normalize( rho + gaussian(.8,.8,sigma) );
-%         epsilon=min(f0(:));    
-%          
+%         epsilon=min(f0(:));
+%
 %                   obstacle(15:24,13:15,:)=1;
 %          obstacle(15:17,15:20,:)=1;
 %          obstacle(20:20,25:25,:)=1;
@@ -78,7 +78,7 @@ switch test
         f0 = gaussian(.08,.08,sigma);
         f1 = gaussian(.92,.92,sigma);
         obstacle=zeros(N,P,Q);
-       
+
         A=ones(N,P);
         I=Im(:,:,1)>0;
         A(I)=0;
@@ -86,15 +86,15 @@ switch test
             obstacle(:,:,i)=A;
         end
 
-     
+
         I=obstacle(:,:,1)>0;
         f0(I)=0.;
         f1(I)=0.;
         f0=normalize(f0);
         f1=normalize(f1);
-        
+
         epsilon=min(f0(:));
-        
+
     otherwise
         error('Unknown');
 end
@@ -126,7 +126,7 @@ if 0
     L = e(end);
 end
 
-% to add into the J functional, J(K(U)+b) 
+% to add into the J functional, J(K(U)+b)
 b = zeros(N,P,Q,3);
 b(:,:,1,3) = f0/2; b(:,:,end,3) = f1/2;
 
@@ -143,7 +143,7 @@ proxF    = @(X,gamma)proxJeps(X+b,gamma)-b;
 proxFS   = compute_dual_prox(proxF);
 proxG    = @(U,gamma)pd_div_proj(U);
 % functionals
-J = @(V)sum3(  sum(V(:,:,:,1:2).^2,4) ./ (max((V(:,:,:,3)),max(epsilon,1e-10)).^alpha)  );  %pb interpU not >0  
+J = @(V)sum3(  sum(V(:,:,:,1:2).^2,4) ./ (max((V(:,:,:,3)),max(epsilon,1e-10)).^alpha)  );  %pb interpU not >0
 
 
 
@@ -151,7 +151,7 @@ J = @(V)sum3(  sum(V(:,:,:,1:2).^2,4) ./ (max((V(:,:,:,3)),max(epsilon,1e-10)).^
 % Run the algorithm.
 
 % initialization
-U0 = staggered(d); U0.M{3} = f_init; 
+U0 = staggered(d); U0.M{3} = f_init;
 % parameters
 options.theta = 1.;
 options.sigma=85;
@@ -194,7 +194,3 @@ title('J');
 subplot(2,1,2);
 plot((Constr(10:end)), '.-'); axis tight;
 title('div=0 violation');
-
-
-
-
