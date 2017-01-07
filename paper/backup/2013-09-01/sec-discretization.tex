@@ -1,0 +1,123 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discretized Dynamic Optimal Transport}
+
+For simplicity of exposure, we describe the discretization for the 1-D case. It extends verbatim to higher dimensional discretization $d>1$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered Grid}
+
+We denote $N+1$ the number of discretization points in space, and $P+1$ the number of discretization points in time. We introduce the centered grid discretizing the space-time square $[0,1]^2$ in $(N+1)\times(P+1)$ points as
+\eq{
+	\Gc = \enscond{ (x_i=i/N ,\, t_j=j/P) \in [0,1]^2 }{ 0 \leq i \leq N, 0 \leq j \leq P }.
+}
+We denote 
+\eq{
+	V=(m,f)\in \Ec=(m_{i,j}, f_{i,j}))_{ 0 \leq i \leq N }^{ 0 \leq j \leq P }
+}
+the variables discretized on the centered grid, where $\Ec = (\RR^{d+1})^{\Gc}= (\RR^{2})^{\Gc}$ 
+is the finite dimensional space of centered variables. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Staggered Grid}
+
+The use of staggered grid is very natural in the context of the discretization of divergence operator associated to a vector field $(u_i)$. The basic idea is to allow an accurate evaluation of every partial derivative $\partial_{x_i} u_i(P)$ at prescribed nodes  $P$ of a cartesian grid  using standard centered finite differences. One way to perform this computation is to impose to the grid on which the $u_i$ scalar field to be centered on $P$ points along the $x_i$ direction. This simple requirement forces the $u_i$ scalar field to be defined on different grids. The resulting  discrete vector field gives us the possibility to evaluate the divergence operator by a uniform standard centered scheme which is not possible using a single grid of discretization for every component of $(u_i)$. As a consequence, similarly to the discretization of PDE's in incompressible fluid dynamics (see for instance~\cite{Harlow1965}), we consider a staggered grid discretization which is more relevant to deal with the continuity equation:
+\begin{align*}
+	\Gs^x \hspace{-0.05cm}&=\hspace{-0.1cm} \enscond{ \left(x_{i}=(i+1/2)/N ,\, t_j=j/P\right) \in \frac{[-1,2N+1]}{2N}\times[0,1]} {\hspace{-0.15cm}-1 \leq i \leq  N, 0 \leq j \leq  P },\\
+	\Gs^t \hspace{-0.05cm}&=\hspace{-0.1cm} \enscond{ \left(x_i=i/N,\, t_{j}=(j+1/2)/P\right) \in [0,1]\times\frac{[-1,2P+1]}{2P}}{ 0 \leq i \leq  N, -1 \leq j \leq  P }.
+\end{align*}
+
+From these definitions, we see that $\Gs^x$ contains $(N+2)\times(P+1)$ points and $\Gs^t$ corresponds to a $(N+1)\times(P+2)$ discretization. We finally denote 
+\eq{
+	U=(\bar m,\bar f) \in \Es = ( (\bar m_{i,j})_{ -1 \leq i \leq  N }^{ 0 \leq j \leq  P },
+	 (\bar f_{i,j})_{ 0 \leq i \leq  N }^{ -1 \leq j \leq  P } )
+}
+the variables discretized on the staggered grid, where $\Es = \RR^{\Gs^x} \times \RR^{\Gs^t}$ is the finite dimensional space of staggered variables. 
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation  and Divergence Operators}
+
+We introduce a midpoint interpolation operator $\interp : \Es \rightarrow \Ec$,  where, for $U = (\bar m,\bar f) \in \Es$, we define  $\interp(U) = (m,f) \in \Ec$  as
+\eql{\label{eq-defn-interp}    
+	\foralls 0 \leq i\leq  N, \quad \foralls 0 \leq j \leq  P, \quad
+	\left\{\begin{array}{cl}
+		m_{i,j} &= (\bar m_{i-1,j} + \bar m_{i,j})/2,  \\
+  		f_{i,j} &= (\bar f_{i,j-1} + \bar f_{i,j})/2.
+\end{array}\right.
+}
+
+
+The space-time divergence operator $\diverg : \Es \rightarrow \RR^{\Gc}$ is defined, for $U = (\bar m,\bar f) \in \Es$ as
+\eq{
+	\foralls 0 \leq i \leq  N, \: \foralls 0 \leq j \leq  P, \quad
+	\diverg(U)_{i,j} = 
+	N(\bar m_{i,j} - \bar m_{i-1,j}) + 
+	P(\bar f_{i,j} - \bar f_{i,j-1}).
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Constraints}
+
+We extract the boundary values on the staggered grid using the linear operator $b$, defined, for $U = (\bar m,\bar f) \in \Es$ as
+\eq{
+	b(U) = \left( (\bar m_{-1,j}, \bar m_{N,j})_{j=0}^{P}, (\bar f_{i,-1}, \bar f_{i,P} )_{i=0}^{N}\right)
+	\in \RR^{P+1}\times\RR^{P+1} \times\RR^{N+1}\times\RR^{N+1}.
+}
+We impose the following boundary values 
+\eq{
+	b(U)=b_0
+	\qwhereq
+	b_0 = (0,0,f^0,f^1) \in \RR^{P+1}\times\RR^{P+1} \times \RR^{N+1} \times \RR^{N+1},
+}
+where $f^0,f^1 \in \RR^{N+1}$ are the discretized initial (time $t=0$) and final (time $t=1$) densities and the spatial boundary constraint $0\in  \RR^{P}$ on the momentum $m=fv$ comes from the discretized  Neumann boundary conditions on the velocity field $v$.  Notice that in the 2-D or 3-D  cases, Neumann and Dirichlet Boundary conditions do not coincide. For instance in 2-D, Neumann conditions are equivalent to force the first component of $\bar m$ to be zero only on the vertical segments of the boundary whereas the second component vanishes only on the horizontal ones.   
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Convex Problem}
+
+The initial continuous problem~\eqref{eq-bb-continuous} is approximated on the discretization grid by solving the finite dimensional convex problem
+\eql{ \label{eq-optim-bb-disc}
+	\umin{U \in \Es} \Jfunc(\interp(U)) + \iota_\Cinc(U). 
+}
+Here, for a closed convex set $\Cc$, we have denoted its associated indicator function
+\eq{
+	\iota_\Cc(U) = 
+	\left\{\begin{array}{cl}
+		0 &\text{if } U \in \Cc,\\
+		+\infty &\text{otherwise.}
+	\end{array}\right.
+}
+
+The discrete objective functional $\Jfunc$ reads for $V=(m,f) \in \Ec$:
+\eql{\label{eq-jfunc-totale}
+	\Jfunc(V) = \sum_{k \in \Gc} \jfunc(m_k,f_k),
+}	
+where we denote $k=(i,j) \in \Gc$ the indexes on the centered grid, and the functional $\jfunc$ is defined in~\eqref{eq-j-func}.
+
+The constraint set $\Cinc$ corresponds to the divergence-free constraint together with the boundary constraints
+\eq{
+	\Cinc = \enscond{U \in \Gs}{ \diverg(U) = 0 \qandq b(U)=b_0}.
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second Order Cone Programming Formulation}
+\label{sec-socp}
+
+The discretized problem~\eqref{eq-optim-bb-disc} can be equivalently solved as the following minimization over variables $(U,V,W) \in \Es \times \Ec \times \RR^{\Gc}$
+\eql{\label{eq-formulation-socp}
+	\umin{ (V,W) \in \Kk,  V=\Ii(U) } \sum_{k \in \Gc} W_k
+}
+where $\Kk$ is the product of (rotated) Lorentz cones 
+\eq{
+	\Kk = \enscond{ (V = (\bar m,\bar f)),W) \in \Ec \times \RR^{\Gc} }{ \foralls k \in \Gc, \; \norm{\bar m_k}^2 - W_k \bar f_k \leq 0 }.
+}
+Problem~\eqref{eq-formulation-socp} is a specific instance of so-called second-order cone program (SOCP), that can be solved in time polynomial with the accuracy using interior point methods (see Section~\ref{sec-previous} for more details). As already mentioned in Section~\ref{sec-previous}, we focus in this article on proximal splitting methods, that are more adapted to large scale imaging problems. 
+
+
+

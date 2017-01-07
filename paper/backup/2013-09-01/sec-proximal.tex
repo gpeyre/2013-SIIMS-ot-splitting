@@ -1,0 +1,233 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proximal Splitting Algorithms}
+\label{sec-proximal}
+
+In this section, we review some splitting schemes and detail how they can be applied to solve~\eqref{eq-optim-bb-disc}. This requires to compute the proximal operators of the cost function $J$ and of indicator of the constraint set $\Cinc$. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Operators and Splitting Schemes}
+
+The minimization of a convex functional over some Hilbert space $\Hh$ requires the use of algorithms that are tailored to the specific properties of the functional. Smooth functions can be minimized through the use of gradient descent steps, which amounts to apply repeatedly the mapping $\Id_{\Hh} - \ga \nabla F$ for a small enough step size $\ga>0$. Such schemes can not be used for non-smooth functions such as the one considered in~\eqref{eq-optim-bb-disc}. 
+
+A popular class of first order methods, so-called proximal splitting schemes, replace the gradient descent step by the application of the proximal operator. The proximal operator $\prox_{\ga F} : \Hh \rightarrow \Hh$ of a convex, lower semi-continuous and proper functional $F : \Hh \rightarrow \RR \cup \{+\infty\}$ is defined as
+\eql{\label{eq:def_prox} 
+	\prox_{\ga F}(U) = \uargmin{U' \in \Hh} \frac{1}{2} \norm{U-U'}^2 + \ga F(U'). 
+}
+This proximal operator is a single-valued map, which is related to the set-valued map of the sub-differential $\partial F$ by the relationship $\prox_{\ga F} = ( \Id_{\Hh} + \ga \partial F )^{-1}$. This is why the application of $\prox_{\ga F}$ is often referred to as an implicit descent step, which should be compared with the explicit gradient descent step, $\Id_{\Hh} - \ga \nabla F$. 
+
+Proximal operators enjoys several interesting algebraic properties which helps the practitioner to compute it for complicated functionals. A typical example is the computation of the proximal operator of the Legendre-Fenchel transform of a function. The Legendre-Fenchel transform of $F$ is defined as
+\eq{
+	F^*(V) = \umax{U \in \Hh} \dotp{U}{V}-F(U).
+}
+Note that thanks to Moreau's identity
+\eql{\label{eq-moreau-identity}
+	\prox_{\ga F^\star}(U) = U - \ga \prox_{F/\ga}(U/\ga),
+}
+computing the proximal operator of $F^*$ has the same complexity as computing the proximal operator of $F$. 
+
+To enable the use of this proximal operators within an optimization, scheme, it is to be able to compute it efficiently. We call a function $F$ such that $\prox_{\ga F}$ can be computed in closed form a \textit{simple function}. It is often the case the the function to be minimized is not simple. The main idea underlying proximal splitting method is to decompose this function into a sum of simple functions (possibly composed by linear operators). We detail bellow two popular schemes, the Douglas-Rachford algorithm and a primal-dual algorithm.  We refer the reader to~\cite{combettes-pesquet-review} for a detailed review of proximal operator and proximal splitting scheme. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing $\prox_{\ga \Jfunc}$}
+
+The following proposition shows that the functional $\Jfunc$ defined in~\eqref{eq-jfunc-totale} is simple, in the sense that its proximal operator can be computed in closed form. 
+
+\begin{prop}\label{proposition1}
+	One has
+	\eq{
+		\foralls V \in \Ec, 
+		\quad \prox_{\ga \Jfunc}(V) = ( \prox_{\ga \jfunc}(V_k) )_{k \in \Gc}
+	}
+	where, for all $(\tilde m,\tilde f) \in \RR^d \times \RR$, 
+	\eq{
+		\prox_{\ga \jfunc}(\tilde m,\tilde f) = 
+		\left\{\begin{array}{cl}
+	  		(\mu(f^{\star}),f^\star) &\text{if } f^\star > 0, \\
+		  	(0,0) &\text{otherwise}.\end{array}\right.
+	}
+	\eql{\label{eq:mstar}
+		\qwhereq
+		\foralls f \geq 0, \quad \mu(f) = \frac{ f \tilde m}{ f + 2\ga }
+	}
+	and $f^\star$ is the largest real root of the third order polynomial equation in $X$
+	\eql{\label{eq:polynome3}
+		P(X)=(X-\tilde f)(X+2\ga) ^2-\ga\norm{\tilde m}^2 = 0	.
+	}
+\end{prop}
+\begin{proof}
+	This proposition is a special case of Proposition~\ref{prop-generalized}. 
+\if 0
+	We denote $(m,f) = \prox_{\ga \jfunc}(\tilde m,\tilde f)$. 
+	If $f > 0$, since $\jfunc$ is $C^1$ and is strongly convex on $\RR^d \times \RR^{+,*}$, necessarily $(m,f)$ is the unique solution of $\nabla \jfunc(m,f)=0$, which reads
+	\eq{
+		\choice{
+			\ga \frac{m}{f} + m-\tilde m=0, \\
+			 -\ga \frac{\norm{ m}^2}{f^{2}} + f-\tilde f = 0.
+		}
+	}
+	Reformulating these equations leads to the following equivalent conditions
+	\eq{
+		P(f) = 0
+		\qandq
+		m = \mu(f).
+	}
+	This shows that if $P$ as at least a strictly positive real root $f^\star$, it is necessarily unique and that $(f=f^\star,m=\mu(f^\star))$.
+	On the contrary, one necessarily have $f=0$, and by definition of $J$, $m=0$ as well.
+\fi
+\end{proof}
+
+
+%%% OLD %%%
+
+\if 0
+
+We have the following relations that cancel the derivative of the optimization problem defining the proximal map $\prox_{\ga J}(\tilde m,\tilde f)$:
+\begin{eqnarray}
+&2 \ga \frac{m}{f} + m-\tilde m=0 \qandq -\ga \frac{\norm{ m}^2}{f^{2}} +
+      f-\tilde f = 0, &     \text{if }f>0, \label{eq:optim1}\\
+&f=0\qandq m=0&\text{otherwise},\label{eq:optim2}
+\end{eqnarray}
+ Reformulating the  expressions of~\eqref{eq:optim1}, one obtains:
+\eq{
+     m = \frac{ f \tilde m}{ f + 2\ga } \qandq (f-\tilde f)(f+2\ga) ^2-\ga\norm{\tilde m}^2 = 0.
+}
+which gives us the relations~\eqref{eq:mstar} and~\eqref{eq:polynome3} and thus implicitly cover the case~\refeq:optim2}.
+As a consequence, $m^*$ is deduced from $f^*$ which is obtained by first solving~\eqref{eq:polynome3} and next projecting on the positive constraint. Let us now show why $f^*$ is obtained from the largest real root and not from other roots. First observe that if all the real root are negatives, then their projections on the set of acceptable  densities $\RR^+$ all give $f^*=0$, so that we will have $(m^*,f^*)=(0,0)$ from~\eqref{eq:mstar}, which is equivalent to the optimal constraint~\eqref{eq:optim2}. We therefore have to show that there is at most one positive real root of $P$.
+
+If $\norm{\tilde m}=0$,  the proximal operator gives $m^*=\tilde m=0$ and $f^*$ as the projection of $\tilde f$ on the positive densities set. On the other hand, as the polynomial roots are $\{-2\ga,\tilde f\}$, the projection of the largest real root on the set of positive densities gives us $f^*=\max\{-2\ga,0,\tilde f\}=\max\{0,\tilde f\}$ and $m^*=0$ from~\eqref{eq:mstar}, so that both computations are equivalent.
+
+Next, if $\norm{\tilde m}>0$, the polynomial real roots should necessarily check $f^*>\tilde f$, as $P(f)<0$ for $f\leq \tilde f$. 
+The polynomial derivative reads $P'(X)= (X+2\ga) (3X+2(\ga-\tilde f))$. Let us finally describe $2$ sub-cases. If $\tilde f\geq-2\ga$ then $P$ is strictly increasing for $f>\tilde f$, so there is only one real root. 
+For the case $\tilde f< -2\ga$, first observe that the $P'$ vanishes at points $\{-2\ga; 2(\tilde f-\ga)/3\}$, so that $P$ is increasing on $\RR^+$ and there can only have one positive root.
+\fi
+
+%%% END OLD %%%
+
+Note that since $\jfunc$ is a positive 1-homogenous functional, its Legendre-Fenchel transform is the indicator of a convex set
+\eq{
+	\jfunc^* = \iota_{\Cc_\jfunc} \qwhereq
+	\Cc_\jfunc = \enscond{ (a,b) \in \RR^d \times \RR }{ 2\norm{a}^2 + b \leq 0 }.
+}
+This allows to re-write the functional $\jfunc$ as
+\eq{
+	\jfunc(m,f) = \sup_{(a,b)\in \Cc_\jfunc} \dotp{a}{m} + b \, f
+} 
+which is essentially the approach used in \cite{Benamou2000} to apply the ADMM algorithm on a dual problem. Note that to relate this approach to the Douglas-Rachford algorithm described bellow, one can directly use the Moreau's identity~\eqref{eq-moreau-identity} to compute the proximal operator of $\jfunc$ using the orthogonal projection on $\Cc_j$
+\eq{
+	\prox_{\ga \jfunc}(v) = v - \ga \proj_{\Cc_{\jfunc}} (v/\ga). 	
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing $\proj_{\Cinc}$}
+
+The proximal mapping of $\iota_\Cinc$ is $\proj_{\Cinc}$ the orthogonal projector on the convex set $\Cinc$. This is an affine set that can be written as 
+\eq{
+	\Cc = \enscond{ U =(m,f) \in \Es }{ A U = y }
+	\qwhereq
+	A U = (\diverg(U), b(U))
+	\qandq
+	y = (0,b_0).
+}
+This projection can be computed by solving a linear system as
+\eq{
+	\proj_{\Cinc} = (\Id - A^* \De^{-1} A) + A^* \De^{-1} y
+}
+where applying $\De^{-1} = (AA^*)^{-1}$ requires solving a Poisson equation on the centered grid $\Gc$ with the prescribed boundary condition. This can be achieved with Fast Fourier Transform in $O(NP \log(NP))$ operations where $N$ and $P$ are number of spatial and temporal points, see~\cite{Strang1988}. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Douglas-Rachford Solver}
+\label{DR-algo}
+
+The Douglas-Rachford (DR) algorithm~\cite{Lions-Mercier-DR} is a proximal splitting method that allows one to minimize the sum of two simple functions. 
+
+%%
+\paragraph{Splitting reformulation.}
+
+We recast the initial optimal transport problem~(\ref{eq-optim-bb-disc}) as
+\eql{\label{eq-dr-problem}
+	\umin{ z=(U,V) \in \Es \times \Ec } G_1(z) + G_2(z)
+}
+where we have defined the functionals
+\eq{
+	\foralls z=(U,V) \in \Es \times \Ec, \quad
+	G_1(z) = \Jfunc(V) + \iota_{\Cinc}(U)
+	\qandq
+	G_2(z) = \iota_{\Cc_{s,c}}(z).
+}
+In this expression, $\Cc_{s,c}$ is the constraint set that couples staggered and centered variables
+\eq{
+	\Cc_{s,c} = \enscond{z=(U,V) \in \Es \times \Ec}{ V=\interp(U) }
+}
+and $\interp$ is the interpolation operator defined in~\eqref{eq-defn-interp}.
+
+%%
+\paragraph{Proximal operators for DR.}
+
+Both $G_1$ and $G_2$ are simple since
+\begin{align*}
+	\prox_{\ga G_1}(U,V) &= ( \proj_{\Cinc}(U), \prox_{\ga \Jfunc}(V) ), \\
+	\prox_{\ga G_2}(U,V) &= \proj_{\Cc_{s,c}}(U,V) = ( \tilde U, \Ii(\tilde U) )
+	\qwhereq
+	\tilde U = (\Id + \Ii^* \Ii)^{-1}( U + \Ii^*(V) )
+\end{align*}
+where $\interp^*$ is the adjoint of the linear interpolation operator. Note that computing $\proj_{\Cc_{s,c}}$ requires solving a linear system, but this system is separable along each dimension of the discretization grid, so it only requires solving a series of small linear systems. Furthermore, since the corresponding inverse matrix is the same along each dimension, we pre-compute explicitly the inverse of these $d+1$ matrices. 
+
+\if 0
+%%% OLD %%%
+\eq{
+	(U + \interp^* \tilde V, V-\tilde V) ={ \cancel{(\tilde U, \interp \tilde V)}= (\tilde U, \interp \tilde U)=(\interp ^*(\interp \interp^*)^{-1}\tilde V, \tilde V)?
+}
+ $\interp$ and the orthogonal projector on the linear space $\Cc_{s,v}$ can be computed in two alternative way using
+\eq{
+	\choice{
+		\tilde V = (\Id + \interp \interp^*)^{-1}(\interp U-V), \\
+		\tilde U = (\Id + \interp^* \interp)^{-1}(\interp^* V + U).
+	}	
+}
+\fi
+
+
+%%
+\paragraph{DR iterations.}
+
+The iterates of the DR algorithm defines a sequence $(\iter{z}, \iter{w})\in(\Es \times \Ec)\times(\Es \times \Ec)$ using a initial $w^{(0)}$ and 
+\begin{align}\label{eq-dr-iters}
+	\iter{z} &= \prox_{\ga G_2}(\iter{w}), \\
+	\iiter{w} &= \pa{1-\frac{\al}{2}} \iter{w} + \frac{\al}{2} \rprox_{\ga G_2} \circ \rprox_{\ga G_1}(\iter{w})
+\end{align}
+and where we used the following shortcut notation for the reflexive proximal mapping
+\eq{
+	\rprox_{\ga G}(z) = 2 \prox_{\ga G}(z) - z.
+}
+If $0 < \al < 2$ and $\ga > 0$, one can show that $\iter{z} \rightarrow z^\star$ a solution of~\eqref{eq-dr-problem}, see~\cite{Combettes2007} for more details. In our case, the iterates reads $\iter{z} = (\iter{U}, \iter{V})$, which allows one to retrieve an approximation $\iter{f}$ of the transport geodesic as $\iter{U} = (\iter{m},\iter{f})$. 
+
+In the case that $\al=1$ (no relaxation), one can show that the DR algorithm is equivalent to the ADMM on the dual \cite{Eckstein1992} and to the ALG2 \cite{Fortin1983} used by Benamou and Brenier in~\cite{Benamou2000} to solve the optimal transport problem on a centered grid. Since we consider a staggered grid, the use of the interpolation operator makes our optimization problem~\eqref{eq-dr-problem} different from the original ALG2 and requires the introduction of an auxiliary variable $V$. Furthermore, the introduction of an extra relaxation parameter $\al$ is useful to speed-up the convergence of the method, as will be established in the experimentations.
+
+The iteration~\eqref{eq-dr-iters} guarantees that the iterates satisfy $\iter{U}=\interp(\iter{V})$. It is also possible to exchange the roles of $G_1$ and $G_2$, which defines a different algorithm, for which the iterates satisfy $\diverg(\iter{U})=0$ and $\iter{V}$ is a positive density (but condition $\iter{U}=\interp(\iter{V})$ does not hold in general).
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal-Dual Solver}
+\label{PD-algo}
+
+Primal dual (PD) algorithm such as the relaxed Arrow-Hurwitz method introduced in~\cite{Chambolle2011} allows one to minimize functionals of the form $G_1+G_2 \circ A$ where $A$ is a linear operator and $G_1, G_2$ are simple functions. One can thus directly apply this method to problem~\eqref{eq-optim-bb-disc} with $G_2=\Jfunc$, $A=\interp$ 	and $G_1 = \iota_{\Cinc}$.
+
+The iterations compute a sequence $(\iter{U},\iter{\Upsilon}, \iter{V}) \in \Es \times \Es \times \Ec$ of variables from an initial $(\Upsilon^{(0)}, V^{(0)})$ according to
+\begin{align*}
+	\iiter{V} &= \prox_{\sigma G_2^*}( \iter{V} + \sigma \interp    \iter{\Upsilon} ), \\
+	\iiter{U} &= \prox_{\tau G_1}(  \iter{U} - \tau \interp^*\iiter{V}   ), \\
+	\iiter{\Upsilon} &= \iiter{U} + \theta (  \iiter{U} - \iter{U} ).
+\end{align*}
+Note that $\prox_{\sigma G_2^*}$ can be computed using $\prox_{G_2}$ following equation~\eqref{eq-moreau-identity}. If $0 \leq \theta \leq 1$ and  $\sigma \tau \norm{\interp}^2<1$ then one can prove that $\iter{U} \rightarrow U^\star$ which is a solution of~\eqref{eq-optim-bb-disc}.
+
+The case $\th=0$ corresponds to the Arrow-Hurwicz algorithm~\cite{Arrow1958}, and the general case can be interpreted as a preconditioned version of the ADDM algorithm.
+
+
+

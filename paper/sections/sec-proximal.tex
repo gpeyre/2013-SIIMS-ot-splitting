@@ -1,0 +1,505 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proximal Splitting Algorithms}
+\label{sec-proximal}
+
+In this section, we review some splitting schemes and detail how they can be applied to solve~\eqref{eq-optim-bb-disc}. This requires to compute the proximal operators of the cost function $J$ and of indicator of the constraint set $\Cinc$. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Operators and Splitting Schemes}
+
+The minimization of a convex functional $F$ over some Hilbert space $\Hh$ requires the use of algorithms that are tailored to the specific properties of the functional. Smooth functions can be minimized through the use of gradient descent steps, which amounts to apply repeatedly the mapping $\Id_{\Hh} - \ga \nabla F$ for a small enough step size $\ga>0$. Such schemes can not be used for non-smooth functions such as the one considered in~\eqref{eq-optim-bb-disc}. 
+
+A popular class of first order methods, so-called proximal splitting schemes, replaces the gradient descent step by the application of the proximal operator. The proximal operator $\prox_{\ga F} : \Hh \rightarrow \Hh$ of a convex, lower semi-continuous and proper functional $F : \Hh \rightarrow \RR \cup \{+\infty\}$ is defined as
+\eql{\label{eq:def_prox} 
+	\prox_{\ga F}(z) = \uargmin{\tilde z \in \Hh} \frac{1}{2} \norm{z-\tilde z}^2 + \ga F(\tilde z). 
+}
+This proximal operator is a single-valued map, which is related to the set-valued map of the sub-differential $\partial F$ by the relationship $\prox_{\ga F} = ( \Id_{\Hh} + \ga \partial F )^{-1}$. This is why the application of $\prox_{\ga F}$ is often referred to as an implicit descent step, which should be compared with the explicit gradient descent step, $\Id_{\Hh} - \ga \nabla F$. 
+
+Proximal operators enjoy several interesting algebraic properties which help the practitioner to compute it for complicated functionals. A typical example is the computation of the proximal operator of the Legendre-Fenchel transform of a function. The Legendre-Fenchel transform of $F$ is defined as
+\eql{\label{eq-legendre-transform}
+	F^*(w) = \umax{z \in \Hh} \dotp{z}{w}-F(z).
+}
+Note that thanks to Moreau's identity~\cite{Moreau1965}
+\eql{\label{eq-moreau-identity}
+	\foralls w \in \Hh, \quad \prox_{\ga F^\star}(w) = w - \ga \prox_{F/\ga}(w/\ga),
+}
+computing the proximal operator of $F^*$ has the same complexity as computing the proximal operator of $F$. 
+
+To enable the use of these proximal operators within an optimization scheme, it is necessary to be able to compute them efficiently. We call a function $F$ such that $\prox_{\ga F}$ can be computed in closed form a \textit{simple function}. It is often the case that the function to be minimized is not simple. The main idea underlying proximal splitting methods is to decompose this function into a sum of simple functions (possibly composed by linear operators). We detail bellow three popular splitting schemes, the Douglas-Rachford (DR) algorithm, the Alternating Direction Method of Multipliers (ADMM) and a primal-dual algorithm.  We refer the reader to~\cite{combettes-pesquet-review} for a detailed review of proximal operators and proximal splitting schemes. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing $\prox_{\ga \Jfunc}$}
+
+The following proposition shows that the functional $\Jfunc$ defined in~\eqref{eq-jfunc-totale} is simple, in the sense that its proximal operator can be computed in closed form. 
+
+\begin{prop}\label{proposition1}
+	One has
+	\eq{
+		\foralls V \in \Ec, 
+		\quad \prox_{\ga \Jfunc}(V) = ( \prox_{\ga \jfunc}(V_k) )_{k \in \Gc}
+	}
+	where, for all $(\tilde m,\tilde f) \in \RR^d \times \RR$, 
+	\eq{
+		\prox_{\ga \jfunc}(\tilde m,\tilde f) = 
+		\left\{\begin{array}{cl}
+	  		(\mu(f^{\star}),f^\star) &\text{if } f^\star > 0, \\
+		  	(0,0) &\text{otherwise}.\end{array}\right.
+	}
+	\eql{\label{eq:mstar}
+		\qwhereq
+		\foralls f \geq 0, \quad \mu(f) = \frac{ f \tilde m}{ f + \ga }
+	}
+	and $f^\star$ is the largest real root of the third order polynomial equation in $X$
+	\eql{\label{eq:polynome3}
+		P(X)=(X-\tilde f)(X+\ga) ^2-\frac{\ga}2\norm{\tilde m}^2 = 0	.
+	}
+\end{prop}
+\begin{proof}
+	We denote $(m,f) = \prox_{\ga \jfunc}(\tilde m,\tilde f)$. 
+	If $f > 0$, since $\jfunc$ is $C^1$ and is strongly convex on $\RR^d \times \RR^{+,*}$, necessarily $(m,f)$ is the unique solution of $\nabla \jfunc(m,f)=0$, which reads
+	\eq{
+		\choice{
+			\ga \frac{m}{f} + m-\tilde m=0, \\
+			 -\ga \frac{\norm{ m}^2}{f^{2}} + f-\tilde f = 0.
+		}
+	}
+	Reformulating these equations leads to the following equivalent conditions
+	\eq{
+		P(f) = 0
+		\qandq
+		m = \mu(f).
+	}
+	This shows that if $P$ as at least a strictly positive real root $f^\star$, it is necessarily unique and that $(f=f^\star,m=\mu(f^\star))$.
+	On the contrary, one necessarily has $f=0$ and, by definition of $J$, $m=0$ as well.
+\end{proof}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing $\proj_{\Cinc}$}
+
+The proximal mapping of $\iota_\Cinc$ is $\proj_{\Cinc}$ the orthogonal projector on the convex set $\Cinc$. This is an affine set that can be written as 
+\eq{
+	\Cc = \enscond{ U =(m,f) \in \Es }{ A U = y }
+	\qwhereq
+	A U = (\diverg(U), b(U))
+	\qandq
+	y = (0,b_0).
+}
+This projection can be computed by solving a linear system as
+\eq{
+	\proj_{\Cinc} = (\Id - A^* \De^{-1} A) + A^* \De^{-1} y
+}
+where applying $\De^{-1} = (AA^*)^{-1}$ requires solving a Poisson equation on the centered grid $\Gc$ with the prescribed boundary conditions. This can be achieved with Fast Fourier Transform in $O(NP \log(NP))$ operations where $N$ and $P$ are number of spatial and temporal points, see~\cite{Strang1988}. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Douglas-Rachford Solver}
+\label{DR-algo}
+
+%%
+\paragraph{DR algorithm}
+
+The Douglas-Rachford (DR) algorithm~\cite{Lions-Mercier-DR} is a proximal splitting method that allows one to solve
+\eql{\label{eq-dr-problem}
+	\umin{ z \in \Hh } G_1(z) + G_2(z)
+}
+where $G_1$ and $G_2$ are two simple functions defined on some Hilbert space $\Hh$.
+
+The iterations of the DR algorithm define a sequence $(\iter{z}, \iter{w}) \in \Hh^2$ using a initial $(z^{(0)}, w^{(0)})\in \Hh^2$ and 
+\begin{equation}\label{eq-dr-iters}
+\begin{aligned}
+	\iiter{w} &=\iter{w} + \al (\prox_{\ga G_1} (2\iter{z}-\iter{w})-\iter{z}),\\
+\iiter{z} &= \prox_{\ga G_2}(\iiter{w}).
+\end{aligned}
+\end{equation}
+If $0 < \al < 2$ and $\ga > 0$, one can show that $\iter{z} \rightarrow z^\star$ a solution of~\eqref{eq-dr-problem}, see~\cite{Combettes2007} for more details. 
+
+In the following, we describe several possible ways to map the optimal transport optimization~\eqref{eq-optim-bb-disc} into the splitting formulation~\eqref{eq-dr-problem}, which in turn gives rise to four different algorithms.
+
+%%
+\paragraph{Asymmetric-DR (A-DR) splitting scheme}
+
+We recast the initial optimal transport problem~\eqref{eq-optim-bb-disc} as an optimization of the form~\eqref{eq-dr-problem} by using the variables 
+\eq{
+	z=(U,V) \in \Hh = \Es \times \Ec
+}
+and setting the functionals minimized as
+\eq{
+	\foralls z=(U,V) \in \Es \times \Ec, \quad
+	G_1(z) = \Jfunc(V) + \iota_{\Cinc}(U)
+	\qandq
+	G_2(z) = \iota_{\Cc_{s,c}}(z).
+}
+In this expression, $\Cc_{s,c}$ is the constraint set that couples staggered and centered variables
+\eq{
+	\Cc_{s,c} = \enscond{z=(U,V) \in \Es \times \Ec}{ V=\interp(U) }
+}
+and $\interp$ is the interpolation operator defined in~\eqref{eq-defn-interp}.
+
+Both $G_1$ and $G_2$ are simple functions since
+\begin{align}\label{eq-def-dr-functionals}
+	\prox_{\ga G_1}(U,V) &= ( \proj_{\Cinc}(U), \prox_{\ga \Jfunc}(V) ), \\
+	\prox_{\ga G_2}(U,V) &= \proj_{\Cc_{s,c}}(U,V) = ( \tilde U, \Ii(\tilde U) )
+	\qwhereq
+	\tilde U = (\Id + \Ii^* \Ii)^{-1}( U + \Ii^*(V) )
+\end{align}
+where $\interp^*$ is the adjoint of the linear interpolation operator. Note that computing $\proj_{\Cc_{s,c}}$ requires solving a linear system, but this system is separable along each dimension of the discretization grid, so it only requires solving a series of small linear systems. Furthermore, since the corresponding inverse matrix is the same along each dimension, we pre-compute explicitly the inverse of these $d+1$ matrices.
+
+
+In our case, the iterates variables appearing in~\eqref{eq-dr-iters} read $\iter{z} = (\iter{U}, \iter{V})$, which allows one to retrieve an approximation $\iter{f}$ of the transport geodesic as $\iter{U} = (\iter{m},\iter{f})$.
+
+A nice feature of this scheme A-DR is that the iterates always satisfy $\iter{U} \in \Cc$, but in general one does not have $\iter{V} = \interp(\iter{U})$. 
+
+
+%%
+\paragraph{Asymmetric-DR' (A-DR') splitting scheme}
+
+In the DR algorithm~\eqref{eq-dr-iters}, the functionals $G_1$ and $G_2$ do not play a symmetric role. One thus obtains a different algorithm (that we denote as A-DR'), by simply exchanging the definitions of $G_1$ and $G_2$ in~\eqref{eq-def-dr-functionals}. Using this scheme A-DR', one has $\iter{V} = \interp{\iter{U}}$, but in general $\iter{U}$ is not in the constraint set $\Cc$.
+
+
+%%
+\paragraph{Symmetric-DR (S-DR) splitting scheme}
+
+In order to restore symmetry between the functionals $\Jfunc$ and $\iota_\Cc$ involved in the minimization algorithm, one can consider the following formulation
+\eq{
+	z = (U,V,\tilde U, \tilde V) \in \Hh = 	(\Es \times \Ec)^2
+}
+using the following functionals
+\eq{
+	G_1(z) = \Jfunc(V) + \iota_{\Cinc}(U) +	\iota_{\Cc_{s,c}}(\tilde U, \tilde V)
+	\qandq
+	G_2(z) = \iota_{\Dd}(z), 
+}
+where $\Dd$ is the diagonal constraint
+\eql{\label{eq-split-spingarn}
+	\Dd = \enscond{ z = (U,V,\tilde U, \tilde V) \in \Hh }{  
+		U=\tilde U \qandq V=\tilde V
+	}.	
+} 
+These functionals are simple since, for $z = (U,V,\tilde U, \tilde V) \in \Hh$, one has
+\begin{align*}
+	\prox_{\ga G_1}(z) &= 
+	\pa{
+		\proj_{\Cinc}(U), \prox_{\ga \Jfunc}(V),
+		\proj_{\Cc_{s,c}}(\tilde U,\tilde V)
+	}\\
+	\qandq
+	\prox_{\ga G_2}(z) &= \frac{1}{2} \pa{ 
+		U+\tilde U, V+\tilde V, U+\tilde U, V+\tilde V
+	}.
+\end{align*}
+
+The splitting reformulation of the form~\eqref{eq-split-spingarn} was introduced in~\cite{Spingarn85}, and the corresponding DR scheme, extended to a sum of an arbitrary number of functionals, is detailed in~\cite{Pustelnik-PPXA,CombettesPesquet-PPXA}. 
+
+
+%%
+\paragraph{Symmetric-DR' (S-DR') splitting scheme}
+
+Similarely to the relationship between A-DR and A-DR' algorithm, it is possible to define a S-DR' algorithm by reversing the roles of $G_1$ and $G_2$ in the algorithm S-DR.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal-Dual Solver}
+\label{PD-algo}
+
+Primal dual (PD) algorithms such as the relaxed Arrow-Hurwitz method introduced in~\cite{Chambolle2011} allows one to minimize functionals of the form $G_1+G_2 \circ A$ where $A$ is a linear operator and $G_1, G_2$ are simple functions. One can thus directly apply this method to problem~\eqref{eq-optim-bb-disc} with $G_2=\Jfunc$, $A=\interp$ 	and $G_1 = \iota_{\Cinc}$.
+
+The iterations compute a sequence $(\iter{U},\iter{\Upsilon}, \iter{V}) \in \Es \times \Es \times \Ec$ of variables from an initial $(\Upsilon^{(0)}, V^{(0)})$ according to
+\begin{equation}
+\begin{aligned}
+	\iiter{V} &= \prox_{\sigma G_2^*}( \iter{V} + \sigma \interp    \iter{\Upsilon} ), \\
+	\iiter{U} &= \prox_{\tau G_1}(  \iter{U} - \tau \interp^*\iiter{V}   ), \\
+	\iiter{\Upsilon} &= \iiter{U} + \theta (  \iiter{U} - \iter{U} ).
+\end{aligned}
+\end{equation}
+Note that $\prox_{\sigma G_2^*}$ can be computed using $\prox_{G_2}$ following equation~\eqref{eq-moreau-identity}. If $0 \leq \theta \leq 1$ and  $\sigma \tau \norm{\interp}^2<1$ then one can prove that $\iter{U} \rightarrow U^\star$ which is a solution of~\eqref{eq-optim-bb-disc}, see~\cite{Chambolle2011}.
+
+The case $\th=0$ corresponds to the Arrow-Hurwicz algorithm~\cite{Arrow1958}, and the general case can be interpreted as a preconditioned version of the ADDM algorithm, as detailed in~\cite{Chambolle2011}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ADMM Solver on Centered Grid}
+\label{subsec-addm-centered-grid}
+
+In this Section, we give some details about the relationship between the algorithm ALG2 developed by Benamou and Brenier in~\cite{Benamou2000} and our DR algorithms. The original paper~\cite{Benamou2000} considers a finite difference implementation on a centered grid, which leads to solve the following optimization problem
+\eql{\label{eq-min-centered-grid}
+	\umin{ V \in  \Ec } \Jfunc(V) + \iota_{\tilde\Cinc}(V)
+	\qwhereq
+	\tilde\Cc = \enscond{ V \in \Es }{ A V = y }
+} 
+where $A$ is this time defined on a centered grid. 
+
+%%
+\paragraph{Primal problem}
+
+The minimization~\eqref{eq-min-centered-grid} has the form
+\eql{\label{eq-addm-dr-primal}
+	\umin{z \in \Hh} F \circ A(z) + G(z), 
+}
+where $A : \Hh \rightarrow \tilde\Hh$ is a linear operator, and $F \circ A$ and $G$ are supposed to be simple functions. 
+
+For the OT problem on a centered grid~\eqref{eq-min-centered-grid}, the identification is obtained by setting 
+\eq{
+	F = \iota_{\{y\}}
+	\qandq 
+	G = \Jfunc,
+} 
+which are indeed simple functions. One can use the DR algorithm~\eqref{eq-dr-iters} with 
+\eql{\label{eq-bb-splitting-dr}
+	G_1=F \circ A
+	\qandq 
+	G_2=G
+} 
+to solve problems of the form~\eqref{eq-addm-dr-primal}. Of course, the variants A-DR', S-DR and S-DR' considered in Section~\ref{DR-algo} could be used as well on a centered grid.  Since we focus on the relationship with the work~\cite{Benamou2000}, we only consider the splitting \eqref{eq-bb-splitting-dr}.
+
+%%
+\paragraph{Dual problem}
+
+Following~\cite{Benamou2000}, one can consider the Fenchel-Rockafeller dual to the primal program~\eqref{eq-addm-dr-primal}, which reads
+\eql{\label{eq-fenchel-dual-pbm}
+	\umax{s \in \tilde\Hh}  - \pa{ G^* \circ (-A^*)(s) + F^*(s) }.
+}
+In the specific setting of the OT problem~\eqref{eq-min-centered-grid}, $F^*(p) = \dotp{y}{p}$ and the following proposition, proved in~\cite{Benamou2000}, shows that $G^* = \Jfunc^*$ is a projector on a convex set (which is a consequence of the fact that $\Jfunc$ is a 1-homogenous functional). 
+
+\begin{prop}
+	One has
+	\eq{
+		\Jfunc^* = \iota_{ \Cc_{\Jfunc} }
+		\qwhereq
+		\choice{
+			\Cc_{\Jfunc} = \enscond{ V \in \Ec }{ \foralls k \in \Gc, \; V_k \in \Cc_\jfunc }, \\	
+			\Cc_\jfunc = \enscond{ (a,b) \in \RR^d \times \RR }{ \norm{a}^2 + 2b \leq 0 }.
+		}
+	}
+\end{prop}
+\begin{proof}
+	The Lengendre-Fenchel transform~\eqref{eq-legendre-transform} of  the functional $\jfunc$ defined in~\eqref{eq-j-func} at point $(a,b)\in \RR^d \times \RR$ reads
+\eq{
+		\jfunc^*(a,b) =\umax{(m,f) \in \RR^d \times \RR} \dotp{a}{m}+\dotp{b}{f}-\frac{m^2}{2f},
+	}
+where we just  focus on the case $f>0$, since $f=0$ (resp. $f<0$) will always give $\jfunc^*=0$ (resp. $\jfunc^*=-\infty$).
+The optimality conditions  are given by
+	\eq{
+		a =\frac{m}f \qandq b=-\frac{m^2}{2f^2}.
+	}
+Hence, we have that
+\begin{align*}
+	\jfunc^*(a,b) &=\umax{(m,f) \in \Ec} f(\dotp{a}{\frac{m}f}+b) -\frac{m^2}{2f^2}\\
+ &= \umax{(m,f) \in \Ec} f \left(\dotp{a}{a}+2b\right),
+\end{align*}
+which is $0$ if  $\norm{a}^2 + 2b \leq 0$ and $+\infty$ otherwise.
+\end{proof}
+
+Note that one can use the Moreau's identity~\eqref{eq-moreau-identity} to compute the proximal operator of $\jfunc$ using the orthogonal projection on $\Cc_\jfunc$ and vice-versa
+\eq{
+	\prox_{\ga \jfunc}(v) = v - \ga \proj_{\Cc_{\jfunc}} (v/\ga).
+}
+
+%%
+\paragraph{ADMM method}
+
+The Alternating Direction Method of Multipliers (ADMM) is an algorithm to solve a minimization of the form
+\eql{\label{eq-addm-dr-dual}
+	\umin{s \in \tilde\Hh}  H \circ B(s) + K(s) ,    % -> F(x) + G \circ A(x) 
+}
+where we assume that the function $K^* \circ B^*$ is simple and that $B : \tilde\Hh \rightarrow \Hh$ is injective. It was initially proposed in~\cite{GabayMercier,GlowinskiMarroco}.
+
+
+% Change of variables: 
+% F->K
+% G->H
+% A->B
+% x->s
+% y->q
+
+
+We introduce the Lagrangian associated to~\eqref{eq-addm-dr-dual} to account for an auxiliary variable $q \in \Hh$ satisfying $q=Bs$ with a multiplier variable $v \in \Hh$
+\eq{
+	\foralls (s,q,v) \in \tilde \Hh \times \Hh \times \Hh, \quad
+	L(s,q,v) = K(s) + H(q) + \dotp{v}{ Bs-q}, 
+}
+and the augmented Lagrangian for $\ga > 0$
+\eq{
+	\foralls (s,q,v) \in \tilde \Hh \times \Hh \times \Hh, \quad
+	L_\ga(s,q,v) = L(s,q,v)  + \frac{\ga}{2}\norm{ Bs-q}^2
+}
+The ADMM algorithm generates iterates $(\iter{s}, \iter{q}, \iter{v})  \in \tilde \Hh \times \Hh \times \Hh$ as follow 
+\begin{equation}\label{eq-admm-iter}
+\begin{aligned}
+	\iiter{s} &= \uargmin{s} L_\ga(s,\iter{q},\iter{v}), \\
+	\iiter{q} &= \uargmin{q} L_\ga(\iiter{s},q,\iter{v}), \\
+	\iiter{v} &= \iter{v} + \ga (B \iiter{s}-\iiter{q}).
+\end{aligned}
+\end{equation}
+This scheme can be shown to converge for any $\ga > 0$, see~\cite{GabayMercier,GlowinskiMarroco}. A recent review of the ADMM algorithm and its applications in machine learning can be found in~\cite{BoydADMM}.
+
+We introduce the proximal operator $\prox_{\ga F}^B : \Hh \rightarrow \tilde \Hh$ with a metric induced by an injective linear map $B$ 
+\eql{\label{eq-def-proxB}
+	\foralls z \in \Hh, \quad
+	\prox_{K/\ga}^B(z) = \uargmin{s \in \tilde\Hh} \frac{1}{2} \norm{B s - z}^2 + \frac{1}{\ga} K(s).
+}
+One can then re-write the ADMM iterations~\eqref{eq-admm-iter} using proximal maps
+\begin{equation}\label{eq-admm-prox-iters}
+\begin{aligned}
+	\iiter{s} &= \prox_{K/\ga }^B ( \iter{q} - \iter{u}), \\
+	\iiter{q} &= \prox_{H/\ga } ( B\iiter{s} + \iter{u} ), \\
+	\iiter{u} &= \iter{u} + B \iiter{s}-\iiter{q} .
+\end{aligned}
+\end{equation}
+where we have performed the change of variable $\iter{u} = \iter{v}/\ga$ to simplify the notations. 
+
+%\todo{Check, the first update step was written $\prox_{K/\ga }^B ( \iter{q} + \iter{u} )$ and the second one $\prox_{H/\ga } ( B\iiter{s} - \iter{u} )$. }
+
+The following proposition shows that if $K^* \circ B^*$ is simple, one can indeed perform the ADMM algorithm. Note that in the case $\Hh=\tilde\Hh$ and  $B=\Id_{\Hh}$, one recovers Moreau's identity~\eqref{eq-moreau-identity}.
+
+\begin{prop}\label{eq-proxB-proxD}
+One has
+\eq{
+	\foralls z \in \Hh, \quad
+		\prox_{K/\ga}^B(z) = B^+ \pa{ z - \frac{1}{\ga} \prox_{\ga K^* \circ B^* }(\ga z) }.
+}
+\end{prop}
+\begin{proof}
+	We denote $\Uu = \partial K$ the set-valued maximal monotone operator. One has
+	$\partial K^* = \Uu^{-1}$, where $\Uu^{-1}$ is the set-valued inverse operator, and $\partial (K^* \circ B^*) = B \circ\Vv \circ B^*$. 
+	One has $\prox_{\ga K^* \circ B^* } = (\Id + \ga \Vv)^{-1}$, which a single-valued operator. 
+	Denoting  $s = \prox_{K/\ga}^B(z)$, the optimality conditions of~\eqref{eq-def-proxB} lead to
+	\begin{align}
+		& 
+		0 \in B^*( B s - z) + \frac{1}{\ga} \Uu(s) 
+		\Longleftrightarrow 
+		s \in \Uu^{-1} \pa{ \ga B^* B s - \ga B^* z   }
+		\Longleftrightarrow 
+		\ga B s \in \ga \Vv  \pa{ \ga z - \ga B s    } \\
+		& 
+		\Longleftrightarrow
+		\ga B s \in ( \Id + \ga \Vv )\pa{ \ga z - \ga B s   } + \ga B s - \ga z 
+		\Longleftrightarrow
+		\ga z \in ( \Id + \ga \Vv )\pa{ \ga z - \ga B s   } \\
+		&
+		\Longleftrightarrow
+		\ga z - \ga B s = ( \Id + \ga \Vv )^{-1}(\ga z) 
+		\Longleftrightarrow s = B^{+}\pa{ z - \frac{1}{\ga} ( \Id + \ga \Vv )^{-1}(\ga z) }		
+	\end{align}
+	where we used the fact that $B$ is injective. 
+\end{proof}
+
+%%
+\paragraph{Equivalence between ADMM and DR}
+
+The ALG2 algorithm of~\cite{Benamou2000} corresponds to applying the ADMM algorithm to the dual problem~\eqref{eq-fenchel-dual-pbm} that can be formulated as
+\eql{\label{eq-fenchel-dual-pbm2}
+	\umin{s \in \tilde\Hh}   \pa{ G^* \circ (-A^*)(s) + F^*(s) },
+} 
+while retrieving at each iteration the primal iterates in order to solve the primal problem~\eqref{eq-addm-dr-primal}. The following proposition, which was initially proved in~\cite{Gabay83}, shows that applying ADMM algorithm to the dual~\eqref{eq-fenchel-dual-pbm} is equivalent to solving the primal~\eqref{eq-addm-dr-primal} using DR. More precisely, the dual variable (the Lagrange multiplier) $\iter{v}$ of the ADMM iterations is equal to the primal variable $\iter{z}$ of the DR iterations. This result was further extended by~\cite{Eckstein1992} which shows the equivalence of ADMM with the proximal point algorithm and propose several generalizations. For the sake of completeness, we detail the proof of this result using our own notations. 
+
+\begin{prop}
+	Setting
+	\eql{\label{eq-chg-var-dr-addmm}
+		H = G^*, \quad
+		K = F^*, \qandq
+		B = -A^*, 
+	}
+	the DR iterations~\eqref{eq-dr-iters} with functionals~\eqref{eq-bb-splitting-dr} and $\al=1$  are recovered from the ADMM iterations~\eqref{eq-admm-iter} using
+	\begin{align*}
+		   \iter{v}  &= \iter{z},\\
+		\ga  \iter{q} &= \iter{w}-\iter{z}, \\
+		\ga  A^* \iiter{s} &= \iter{z}-\iiter{w}.%, \\
+		%\ga\iiter{q}&=\iiter{w}-\iiter{z}. 
+	\end{align*}
+\end{prop}
+\begin{proof}
+	Denoting $\iter{\bar s} = A^* \iter{s} \in \Im(A^*)$ (recall that $B=-A^*$ is injective), using the change of notations~\eqref{eq-chg-var-dr-addmm} and using the result of Proposition~\ref{eq-proxB-proxD}, the iterates~\eqref{eq-admm-prox-iters} read
+	\begin{equation}\label{eq-equiv-iter1}
+		\begin{aligned}
+		-\iiter{\bar s} &=  \iter{q} - \iter{u}  + \frac{1}{\ga} \prox_{\ga F \circ A}\pa{ \ga(\iter{u}-\iter{q}) }, \\
+		\iiter{q} &=  \iter{u} -\iiter{\bar s} - \frac{1}{\ga} \prox_{\ga G}\pa{ \ga( \iter{u}-\iiter{\bar s} )}, \\
+		\iiter{u} &= \iter{u} - \iiter{\bar s}-  \iiter{q} 
+		\end{aligned}
+	\end{equation}
+where we have used the fact that $\prox_{\ga F \circ (-A)}(z) =  -\prox_{\ga F \circ A}(-z)$.
+%
+%\before{
+%If $A$ is linear then $\prox_{\ga F \circ (-A)}(z)$  is + and not $-\prox_{\ga F \circ A}(-z)$, no? Otherwise, we will have $-\iiter{z}$ in eq. \eqref{eq-identif-3-old} and  \eqref{eq-identif-1-old}, \eqref{eq-identif-2-old}, \eqref{eq-identif-3-old} will give us $\iiter{z}=\iter{u}$ but  $\iiter{\bar{s}}=-\iter{q}$, which is not good at all.
+%
+%
+% 
+%	Recall that the DR iterations~\eqref{eq-dr-iters} read in this setting
+%\begin{equation}\label{eq-equiv-iter2-old}
+%  		\begin{aligned}
+%		\iiter{z} &= \prox_{\ga F \circ A}(\iter{w}), \\
+%		\iiter{r} &= 2\prox_{\ga G}( 2\iiter{z} -\iter{w} ) - (2\iiter{z}-\iter{w})\\
+%		\iiter{w} &= (1-\frac{\al}{2}) \iter{w} + \frac{\al}{2} \iiter{r}.
+%		\end{aligned}
+%	\end{equation}
+%
+%
+%	%\todo{I have changed \eqref{eq-dr-iters} to replace  $\iter{z}$ by $\iiter{z}$. }
+%%	\todo{I have replaced $\iter{\bar s}$ by $-\iiter{\bar s}$}
+%	Iterations~\eqref{eq-equiv-iter1} and~\eqref{eq-equiv-iter2-old} are using the following identification between $(\iter{q}, \iiter{q},\iter{u}, \iiter{\bar s})$ and 
+%	$(\iter{w}, \iiter{z}, \iiter{r})$
+%	\begin{align}
+%		\ga (\iter{u}-\iter{q})  &= \iter{w},\label{eq-identif-1-old}\\
+%		\ga (\iter{u}-\iiter{\bar s} ) &= 2\iiter{z} - \iter{w}, \label{eq-identif-2-old}\\
+%		\ga(  \iter{q}   + \iiter{\bar s}   - \iter{u})&= \iiter{z}, \label{eq-identif-3-old}\\
+%		\ga( \iiter{q}+ \iiter{\bar s}    - \iter{u} )&= -\frac{1}{2} \pa{ \iiter{r} + 2 \iiter{z} - \iter{w} }, \label{eq-identif-4-old}
+%	\end{align}	
+%
+%if the remaining two update equations are compatible, then we should check	
+%	\begin{align}
+%		\iiter{u} &= \iter{u} -\iiter{q} - \iiter{\bar s},\label{eq-update-1-old}\\
+%		\iiter{w} &= (1-\frac{\al}{2}) \iter{w} + \frac{\al}{2} \iiter{r}. \label{eq-update-2-old}
+%	\end{align}	
+%
+%Solving the linear system~\eqref{eq-identif-1-old}-\eqref{eq-identif-4-old}, one gets
+%	\begin{align}
+%		\ga   \iter{u}  &= 3\iiter{z},\label{eq-identif2-1-old}\\
+%		\ga  \iter{q} &= -\iter{w}+3\iiter{z}, \label{eq-identif2-2-old}\\
+%		\ga  \iiter{\bar s} &= \iter{w}+\iiter{z}, \label{eq-identif2-3-old}\\
+%		\ga\iiter{q}&= -\frac{\iter{w}}{2} +\iiter{z} -\frac{\iiter{r} }2. \label{eq-identif2-4-old}
+%	\end{align}
+%From relation~\eqref{eq-identif-1-old} at iteration $\ell+1$, we have
+%$$ \iiter{w}=-\ga (\iiter{q}-\iiter{u}) .$$
+%If the update relation~\eqref{eq-update-1-old} holds, then using relations~\eqref{eq-identif2-1-old}, ~\eqref{eq-identif2-3-old}  and~\eqref{eq-identif2-4-old}  leads to:
+%\begin{align}
+%		\iiter{w} &= -\ga \iiter{q}+\ga(  \iter{u} -\iiter{q} - \iiter{\bar s})\\
+%		 &= \iiter{r},
+%	\end{align}
+%which gives us the update relation~\eqref{eq-update-2-old} for $\alpha=2$.}
+Recall that the DR iterations~\eqref{eq-dr-iters} read in the setting $\al=1$
+\begin{equation}\label{eq-equiv-iter2}
+  		\begin{aligned}
+		\iiter{w} &= \iter{w}+\prox_{\ga F \circ A}(2\iter{z}-\iter{w})-\iter{z}, \\
+		\iiter{z} &= \prox_{\ga G} (\iiter{w}).
+		\end{aligned}
+	\end{equation}
+	Iterations~\eqref{eq-equiv-iter1} and~\eqref{eq-equiv-iter2} are using the following identification between $(\iter{q}, \iiter{q},\iter{u}, \iiter{\bar s})$ and 
+	$(\iter{w}, \iter{z}, \iiter{w}, \iiter{z})$
+
+
+
+	\begin{align}
+		\ga (\iter{u}-\iter{q})  &= 2\iter{z}-\iter{w},\label{eq-identif-1}\\
+		\ga ( \iter{u}-\iiter{\bar s}) &= \iiter{w} , \label{eq-identif-2}\\
+		\ga( \iter{u}- \iter{q}   -\iiter{\bar s}   )&= \iiter{w}+\iter{z}-\iter{w}, \label{eq-identif-3}\\
+		\ga( \iter{u}-\iiter{q}- \iiter{\bar s}     )&=  \iiter{z}, \label{eq-identif-4}
+	\end{align}	
+Solving the linear system~\eqref{eq-identif-1}-\eqref{eq-identif-4}, one gets
+	\begin{align}
+		\ga   \iter{u}  &= \iter{z},\label{eq-identif2-1}\\
+		\ga  \iter{q} &= \iter{w}-\iter{z}, \label{eq-identif2-2}\\
+		\ga  \iiter{\bar s} &= \iter{z}-\iiter{w}, \label{eq-identif2-3}\\
+		\ga\iiter{q}&=\iiter{w}-\iiter{z}. \label{eq-identif2-4}
+	\end{align}
+First notice that relations~\eqref{eq-identif2-2} and~\eqref{eq-identif2-4} are compatible at iterations $\ell$ and $\ell+1$. 
+Then, identifying the update of the variable $u$ presented in~\eqref{eq-equiv-iter1} with  relation~\eqref{eq-identif-4}, we recover $\iiter{z}=\ga\iiter{u}=\iiter{v}$, which corresponds to the relation~\eqref{eq-identif2-1} at iteration $\ell+1$.
+\end{proof}
+
+This proposition thus shows that, on a centered grid, ALG2 of~\cite{Benamou2000} gives the same iterates as DR on the primal problem. Since we consider a staggered grid, the use of the interpolation operator makes our optimization problem~\eqref{eq-dr-problem} different from the original ALG2 and requires the introduction of an auxiliary variable $V$. Furthermore, the introduction of an extra relaxation parameter $\al$ is useful to speed-up the convergence of the method, as will be established in the experimentations. Lastly, let us recall that it is possible to use the variants A-DR', S-DR and S-DR' of the initial A-DR formulation, as detailed in Section~\ref{DR-algo}. 
+
+

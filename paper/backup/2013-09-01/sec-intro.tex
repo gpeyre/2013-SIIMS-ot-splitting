@@ -1,0 +1,104 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+
+Optimal transport is a well developed mathematical theory that defines a family of metrics between probability distributions~\cite{Villani03}. These metrics measure the amplitude of an optimal displacement according to a so-called ground cost defined on the space supporting the distributions. The resulting distance is sometimes referred to as the Wasserstein distance in the case of $L^p$ ground costs. The geometric nature of optimal transportation, as well as the ability to compute optimal displacements between densities, make this theory progressively mainstream in several applicative fields such as economic modeling and image processing. However, the numerical resolution of the optimal transportation problem raises several challenges. This article is focused on the  computation of geodesics for the optimal transport metric associated to the $L^2$ cost. It reviews and extends the approach pioneered by Benamou and Brenier~\cite{Benamou2000} from the perspective of proximal operator splitting in convex optimization. This shows the simplicity and efficiency of this method, which can easily be extended beyond the setting of optimal transport by considering various convex cost functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Previous Works} 
+\label{sec-previous}
+
+
+%%%
+\paragraph{Discrete optimal transport}
+
+The easiest way to discretize and compute numerically optimal transports is to consider finite sums of weighted Diracs. In this specific case, the optimal transport is a multi-valued map between the Diracs locations. % and it is the solution of a linear program. 
+ Specific linear solvers can be used in this context, and in particular network and transportation simplexes~\cite{Dantzig-Book} can scale up to a few thousands of Dirac masses. Dedicated combinatorial optimization methods have been proposed, such as the auction algorithm~\cite{Bertsekas1988}, which can handle integer costs between the Diracs. In the even more restricted case of two distributions with the same number of Diracs with equal weights, the transportation is a bijection between the points, and thus corresponds to the optimal assignment problem~\cite{Burkard09}. Combinatorial optimization methods such as the Hungarian algorithm~\cite{Kuhn-hungarian} have roughly cubic complexity in the number of Diracs. Faster schemes exist for specific cost functions, such as for instance convex cost of the distance on the line (where it boils down to a sorting of the positions) and the circle~\cite{delon-circle}, concave costs on the line~\cite{delon-concave}, the $\ell^1$ distance~\cite{Ling2007}. The computation can be accelerated using multi-scale clustering~\cite{Merigot2011}. Note also that various approximations of the transportation distance have been proposed, see for instance~\cite{Shirdhonkar2008}.
+
+Despite being numerically intensive for finely discretized distributions, this discrete transport framework have found many applications, such as for instance color transfer between images~\cite{Rabin2011}, shape retrieval~\cite{Rubner1998}, surface reconstruction~\cite{deGoes2011} and interpolation for computer graphics~\cite{Bonneel-displacement}
+
+
+%%%
+\medskip
+\paragraph{Optimal transport via PDE's}
+
+The optimal transport for the $L^2$ ground cost has a special structure. It can be shown to be uniquely defined and to be the gradient of a convex function~\cite{Brenier1991}. This implies that it is also the solution of the fully non-linear Monge-Amp\`ere partial differential equation.
+
+% --- PDE Monge ampere ---
+
+Several methods have been proposed to discretize and solve this PDE, such as for instance the method of~\cite{Oliker-Prussner-1988} which converges to the Aleksandrov solution, and the one of~\cite{Oberman-2008} which converges to the viscosity solution of the equation. Alternative methods such as~\cite{Dean-Glowinski-2006} and~\cite{Feng-Neilan-2009} are efficient for regular densities.  A major difficulty in these approaches is to deal with compactly supported densities, which requires a careful handing of the boundary conditions. \cite{Froese2012} proposes to enforce these conditions by iteratively solving a Monge-Ampere equation with Neumann boundary conditions. \cite{Benamou2012} introduces a method requiring the solution of a well-posed Hamilton-Jacobi equation.
+
+% --- AHT et cie --
+
+Another line of methods iteratively constructs mass preserving mappings converging to the optimal transport~\cite{Angenent2003}. This explicitly constructs the so-called polar factorization of the initial map, see also~\cite{Benamou1995} for a different approach. This method is enhanced in~\cite{Haber2010} to avoid drifting from the preservation constraint during the iterations.
+
+% --- AHT et cie --
+
+
+These PDE's based approaches to the resolution of the optimal transport have found several applications,  such as image registration~\cite{haker2004}, density regularization~\cite{Burger2011}, optical flow~\cite{Clarysse2010} and grid generation~\cite{Sulman2011b}.
+
+% Citations enlevées : 
+%~\cite{Kitagawa2012} -> the cost is not necessarily L^2, not in R^d ... A bit weird. 
+%~\cite{Loeper2005}  : juste un newton sur l'EDP ... ne me semble pas très sérieux.
+%~\cite{Sulman2011} (M. Sulman, J. F. Williams, and Robert D. Russell. An efficient approach for the numerical solution of the monge-amp`ere equation.) : je n'y ai pas accès
+
+
+
+%%%
+\medskip
+\paragraph{Dynamical optimal transport}
+
+Instead of computing directly the transport, it is possible to consider the geodesic path between the two densities according to the Wasserstein metric (the so-called displacement interpolation). For the $L^2$ ground cost, this geodesic is obtained by linear interpolation between the identity and the transport. The geodesic can thus be computed by first obtaining the transport and then evolving the densities. If one considers discrete sums of Diracs, this corresponds to solving a convex linear program, and can also be understood as a Lagrangian approximation of the transport between (possibly continuous) densities that have been discretized. This approach is refined in~\cite{Iollo2011}, which considers discretization with mixture of Gaussians.
+
+It is also possible to consider an Eulerian formulation of the geodesic problem, for which densities along the path are discretized on a fixed spatial grid. Conservation of mass is achieved by introducing an incompressible velocity field transporting the densities. The breakthrough paper~\cite{Benamou2000} shows that it is possible to perform a change of variable to obtain a convex problem. They propose to solve numerically the discretized problem with a first order iterative method (more precisely, they use the ADMM algorithm on a dual formulation, see bellow).
+
+Geodesics between pairs of distributions can be extended to barycenters between an arbitrary finite collection of distributions. Existence and uniqueness of this barycenter is studied in~\cite{Carlier_wasserstein_barycenter}. Computing the barycenter between discrete distributions requires the resolution of a convex linear program that corresponds to a multi-marginal optimal transportation. However, in sharp contrast with the case of two distributions, the special case of un-weighted sums of Diracs is not anymore equivalent to an assignment problem, which is known to be NP-hard~\cite{Burkard09}. Computing numerically this barycenter for large scale problems thus requires the use of a non-convex formulation to solve for a Lagrangian discretization, which finds applications in image processing~\cite{Rabin_ssvm11}.
+
+
+%%%
+\medskip
+\paragraph{Generalized transport problems}
+
+The formulation of the geodesic computation as a convex optimization problem initiated by~\cite{Benamou2000} enables the definition of various metrics obtained by changing the objective function. A penalization of the matching constraint~\cite{Benamou2010} allows one to compute an unbalanced transport where densities are not normalized to have the same mass. An interpolation between the $L^2$-Wasserstein and $L^2$ distances is proposed in~\cite{Benamou2001}. Lastly, an interpolation between $L^2$-Wasserstein and $H^{-1}$ distances is described in~\cite{dolbeault2009}. This extension relies in a crucial manner on the convexity of the extended objective function, which enables a theoretical analysis to characterize minimizing geodesics~\cite{Cardaliaguet2012}. Convexity also allows one to use the numerical scheme we propose with only slight modifications with respect to the $L^2$-Wasserstein case. 
+
+%%%
+\medskip
+\paragraph{Optimal transport on Riemannian manifolds}
+
+Many properties of the $L^2$-Was\-ser\-stein distance extend to the setting where the ground cost is the square of the geodesic distance on a Riemannian manifold. This includes in particular the existence and uniqueness of the transport map, which is the manifold exponential of the gradient of a semi-convex map~\cite{McCann-PolarManifold}. Displacement interpolation for transport on manifolds has the same variational characterization as the one introduced in~\cite{Benamou2001} for Euclidean transport, see~\cite{Villani-OldNew} for a detailed review of optimal transport on manifolds. Interpolation between pairs of measures generalizes to barycenters of a family of measures, see~\cite{KimPass-MultiMarg-Manifold}.
+
+Displacement interpolation between Dirac measures amounts to computing a single geodesic curve on the manifold. Discretization and numerical solutions to this problem are numerous. A popular method is the Fast Marching algorithm introduced jointly by~\cite{sethianFM1995,tsitsiklis-TAC} for isotropic Riemannian metrics (i.e. when the metric at each point is a scalar multiple of the identity) discretized on a rectangular grid. The complexity of the method is $O(N \log(N))$ operations, where $N$ is the number of grid points. This algorithm has been extended to compute geodesics on 2-D triangular meshes with only acute angles~\cite{sethian-geodesic-path}. More general discretizations and the extension to Finsler metrics require the use of slower iterative schemes, see for instance~\cite{bornemann-fm}. 
+
+Computing numerically optimal transport on manifolds has been less studied. For weighted sums of Diracs, displacement interpolation is achieved by solving the linear program to compute the coupling between the Diracs and then advancing the Diracs with the corresponding weights and constant velocity along the geodesics. In this article, we propose to extend the Eulerian discretization method~\cite{Benamou2001} to solve for the displacement interpolation on a Riemannian manifold.
+
+%%%
+\medskip
+\paragraph{First order and proximal methods}
+
+The convex problem considered by Benamou and Brenier~\cite{Benamou2000} can be re-casted as the optimization of a linear  functional under second order conic constraints (see Section~\ref{sec-socp} for more details). This class of programs can be solved in time polynomial with the desired accuracy using interior points methods, see for instance~\cite{Nesterov-Nemirovsky-Book}. 
+
+However, the special structure of the problem, specially when discretized on an uniform grid, makes its suitable for first order scheme, and in particular proximal splitting methods. While they do not reach the same convergence speed for arbitrary conic program, they work well in practice for large scale problems, in particular when high accuracy is not mandatory, which is a common setup for problems in image processing. Proximal splitting schemes are first order optimization methods that allows one to minimize a sum of so-called ``simple'' functionals, possibly (for some methods) pre-composed by linear operators. A functional is called ``simple'' when it is possible to compute its proximal operator (see expression~\ref{eq:def_prox} for its precise definition) either in closed form, or with high accuracy using a few iterations of some sub-routine. In this article, we focus our attention to the Douglas-Rachford algorithm, introduced by~\cite{Lions-Mercier-DR} and on primal-dual methods. We make use of the recently proposed method~\cite{Chambolle2011}, but other schemes could be used as well, see for instance~\cite{Briceno-Arias-PD}. We refer the reader to~\cite{combettes-pesquet-review} and the references therein for more information about the properties of proximal maps and the associated proximal splitting schemes. 
+
+Note that the algorithm proposed by~\cite{Benamou2000} corresponds to applying the  Alternating Direction Method of Multiplier (ADDM)~\cite{Fortin1983} to the Fenchel-Rockafeller dual of the (primal) dynamical transport problem. As shown by~\cite{Eckstein1992}, this corresponds exactly to applying directly (a specific instanciation of) the Douglas-Rachford method to the primal problem. 
+
+%%%
+\medskip
+\paragraph{Fluid mechanics discretization}
+
+While Lagrangian methods utilize a mesh-free discretizations (see for instance~\cite{Iollo2011}), thats typically tracks the movement of centers of masses during the transportation, Eulerian method requires a fixed discretization of the spacial domain. The most straightforward strategy is to use an uniform centered discretization of an axis-aligned domain, which is used in most previously cited work, see for instance~\cite{Benamou2000,Angenent2003}. Because of the close connection between dynamical optimal transport and fluid dynamics, we advocate in this article the use of staggered grids~\cite{anderson-cfd}, which better copes with the incompressibility condition. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Contributions}
+
+Our first contribution is to show how the method initially proposed in~\cite{Benamou2000} is a specific instance of the Douglas-Rachford algorithm. This allows one to use several variations on the initial method, by changing the values of the two relaxation parameters. Our second contribution is the introduction of a staggered grid discretization which is the canonical way to enforce incompressibility constraints. We show how this discretization  fits into our proximal splitting methodology by introducing an interpolation operator and either making use of auxiliary variables or primal-dual methods. Our last contribution includes an exploration of several variations on the original convex transportation objective, the one proposed in~\cite{dolbeault2009}, and a specially varying penalization which can be interpreted as replacing the $L^2$ ground cost by a geodesic distance on a Riemannian manifold.  Note that the Matlab source code to reproduce the figures of this article is available online\footnote{\url{http://www.ceremade.dauphine.fr/~peyre/codes/}}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection{Notations}
+
+
+

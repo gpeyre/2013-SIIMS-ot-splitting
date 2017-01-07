@@ -1,0 +1,87 @@
+\section{Relationship Between ADMM and DR Algorithms}
+
+TODO: expand this. 
+
+%%%
+\subsection{ADMM}
+
+\eq{
+	\umin{x} F(x) + G \circ A(x)
+}
+where $A : \RR^N \rightarrow \RR^P$ injective.
+
+Add auxiliary variable
+\eq{
+	\umin{x, y = Ax} F(x) + G(y)
+}
+
+Lagrangian formulation
+\eq{
+	\umin{x, y} \umax{u} L(x,y,u) = F(x) + G(y) + \dotp{u}{y - Ax}
+}
+Augmented Lagrangian formulation
+\eq{
+	\umin{x, y} \umax{u} L_\ga(x,y,u) = L(x,y,u)  + \frac{\ga}{2}\norm{y - Ax}^2
+}
+ADMM algorithm steps:
+\eq{
+	\iiter{x} = \uargmin{x} L_\ga(x,\iter{y},\iter{u})
+}
+\eq{
+	\iiter{y} = \uargmin{y} L_\ga(\iiter{x},y,\iter{u})
+}
+\eq{
+	\iiter{u} = \iter{u} + (\iiter{y} - A \iiter{x})
+}
+Converges for any $\ga > 0$, [Gabay, Mercier, Glowinski, Marrocco, 76]
+
+
+%%%
+\subsection{ADMM, prox-formulation}
+
+Introduce the prox with the $A$ metric
+\eq{
+	\prox_{\ga F}^A(z) = \uargmin{x} \frac{1}{2} \norm{A x - z}^2 + \ga F(x)
+}
+One has
+\eq{
+	\prox_{\ga F}^A = A^+ \pa{ \Id - \ga \prox_{F^* \circ A^* / \ga }(\cdot/\ga) }
+}
+ADMM, prox formulation:
+\eq{
+	\iiter{x} = \prox_{F/\ga }^A ( \iter{y} - \iter{u} )
+}
+\eq{
+	\iiter{y} = \prox_{G/\ga } ( A\iiter{x} + \iter{u} )
+}
+\eq{
+	\iiter{u} = \iter{u} +  (\iiter{y} - A \iiter{x})
+}
+Advantageous if $F^* \circ A^*$ is simple. If $F \circ A$ is simple, use DR. 
+
+
+%%%
+
+
+Fenchel-Rockafellar duality: (here equivalent to Lagrange duality of the original problem on $(x,y)$)
+\eq{
+	\umin{z} F^* (-A^* z) + G^*(z)
+}
+DR applied to $F^* \circ -A^* + G^*$ is ADMM, but this should be understood with the correct change of variables (in particular, one cannot go back from dual to primal, one needs to use inner variables of these algorithm to perform the switch).
+
+DR with $\al=1$:
+\eq{
+	\iiter{z} = \frac{1}{2} \iter{z} + \frac{1}{2} \text{RProx}_{\ga F^* \circ -A^*} \circ \text{RProx}_{\ga G^*}(\iter{z})
+}
+The iterates of ADMM are recovered using:
+\eq{
+	\iiter{x} = \prox_{F/\ga }^A ( \iter{y} - \iter{u} )
+}
+\eq{
+	\iter{y} = \frac{1}{\ga}(\iter{z}-\iter{u})
+}
+\eq{
+	\iter{u} = \prox_{\ga G^*}(\iter{z})
+}
+
+

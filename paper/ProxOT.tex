@@ -1,0 +1,74 @@
+\documentclass[final]{siamltex}
+
+% Be sure to use PDF Latex
+\pdfoutput=1
+
+\usepackage[latin1]{inputenc}
+\usepackage{array}% http://ctan.org/pkg/array
+\usepackage{rotating}
+\usepackage{graphicx,cancel}
+%\usepackage{pdfsync}
+\usepackage{epsfig,hyperref}
+% \usepackage{movie15,animate}
+\usepackage{epstopdf}
+\usepackage{mystyle,ulem}
+\usepackage{color}
+% format A4
+\usepackage{vmargin}
+\setpapersize{A4} 
+
+\usepackage{color}
+\newcommand{\red}{\color{red}}
+\newcommand{\todo}[1]{{\color{red} TODO: #1}}
+
+\newcommand{\now}[1]{{\color{blue} NOW: #1}}
+\newcommand{\before}[1]{{\color{red} BEFORE: #1}}
+
+
+\author{Nicolas Papadakis\thanks{IMB, Universit\'e Bordeaux 1, 351, cours de la Lib\'eration, F-33405 TALENCE, FRANCE.}
+\and Gabriel Peyr\'e\thanks{CEREMADE, Universit\'e Paris-Dauphine, Place du Marechal De Lattre De Tassigny, 75775 PARIS CEDEX 16, FRANCE.}
+\and Edouard Oudet\thanks{LJK, Universit\'e de Grenoble, 51 rue des Math\'ematiques, Campus de Saint Martin d'H\`eres, BP 53, 38041 GRENOBLE CEDEX 09}
+}
+
+
+\graphicspath{{./images/}}
+
+\if 0
+\orderauthors{1}%\NewRandom}
+\author{\listauthors{\auta}
+	 \quad \listauthors{\autb}\\\\
+	 \quad \listauthors{\autc}
+	\
+}
+\fi
+
+\title{Optimal Transport with  Proximal Splitting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+
+% \if 0
+\input{sections/sec-abstract}
+\input{sections/sec-intro}
+\input{sections/sec-dynamical}
+\input{sections/sec-discretization}
+\input{sections/sec-proximal}
+\input{sections/sec-generalizations}
+\input{sections/sec-numerics}
+\input{sections/sec-conclusion}
+% \fi
+% \appendix
+% \input{sections/sec-appendix}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%REFERENCES%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{plain}  % plain alpha
+\bibliography{refs}		
+		
+
+\end{document}

@@ -1,0 +1,77 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dynamical Optimal Transport Formulation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Transport}
+
+In the following, we restrict our exposition to smooth maps $T : [0,1]^2 \mapsto [0,1]^2 $. A valid transport map $T$ is a map that  pushes forward the measure $ f^0(x) \d x$ onto $ f^1(x) \d x $. In term of densities, this corresponds to
+the constraint
+\eq{ 
+	f^0(x) = f^1(T(x)) \abs{\det( \partial T(x) )} 
+}
+where $\partial T(x) \in \RR^{2 \times 2}$ is the differential of $T$
+at $x$. This is known as the gradient equation.
+We call $\Tt(f^0,f^1)$ the set of transport that satisfies this constraint.
+An optimal transport $T$ solves
+\eql{\label{eq-ot} 
+	\umin{T \in \Tt(f^0,f^1) } \int C(x,T(x)) \d x 
+}
+where $C(x,y) \geq 0$ is the cost of assigning $x \in [0,1]^2$ to $y \in [0,1]^2$. 
+In the case $C(x,y)=\norm{x-y}^2$ the optimal transport distance is called the  $L^2$-Wasserstein distance between $f^0$ and $f^1$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fluid Mechanics Formulation}
+
+The geodesic path between the measures with densities $f^0(x)$ and $f^1(x)$ can be shown to have density $t \mapsto f(x,t)$ where $t \in [0,1]$ parameterize the path, where 
+\eq{ 
+	f(x,t) = f^0( (1-t) \text{Id}_d + t T(x)) 
+   \abs{\det( (1-t) \text{Id}_d  + t \partial T(x) )}. 
+} 
+Benamou and Brenier showed in~\cite{Benamou2000} that this geodesic solves the following 
+non-convex problem over the densities $f(x,t) \in \RR$ and a velocity field $v(x,t) \in \RR^2$
+\eql{\label{eq-bb-continuous_velocity} 
+	\umin{ (v,f) \in \Cinc_v } \int_{[0,1]^d} \int_0^1 f(x,t)\norm{v(x,t)}^2 \d t \d x, 
+}
+under the set of non-linear constraints
+\eql{\label{eq-inc-constr} 
+	\Cinc_v = \enscond{(v,f)}{\partial_t f+ \diverg_x(fv) = 0, 
+      \;  v(0,\cdot)=v(1,\cdot)=0, \;  f(\cdot,0)=f^0, \;  f(\cdot,1)=f^1  }. 
+}
+where the first relation in $\Cinc_v$ is the continuity equation. We impose homogeneous Neumann conditions on the velocity field $v$ which are the more natural boundary condition in the case of the square. Notice that both Neumann and Dirichlet boundary conditions can easily be implemented in our framework. The difference relies in the projection step on the divergence constraint. This step which is carried out by fft (see the Matlab implementation) has to be adapted depending on the chosen boundary conditions.  We refer to~\cite{Froese2012,Benamou2012} for relevant boundary conditions for other convex geometries. The temporal boundary constraints on $f$ give the link with the density data.
+
+From a theoretical point of view, the natural setting to prove existence of minimizers of~\eqref{eq-bb-continuous_velocity} is to relax it to the Banach space of Radon measures (i.e. finite Borel measures). It is a sub-space of the space of distributions, and the incompressibility constraint~\eqref{eq-inc-constr} should be understood in the sense of distributions. We refer the interested reader to~\cite{Cardaliaguet2012} for more details regarding the theoretical analysis of a class of variational problems generalizing~\eqref{eq-bb-continuous_velocity}.  
+
+Following~\cite{Benamou2000}, introducing the change of variable $(v,f) \mapsto (m,f)$, where $m$ is the momentum $m = f v$, one obtains a convex optimization problem over the couple $(f,m)$
+\eql{\label{eq-bb-continuous} 
+	\umin{ (m,f) \in \Cinc } 
+	\Jfunc(m,f) = \int_{[0,1]^d} \int_0^1 \jfunc( m(x,t), f(x,t) ) \d t \d x, 
+}
+\eql{\label{eq-j-func}
+	\qwhereq \foralls ( m,  f) \in \RR^d \times \RR, \quad
+	\jfunc( m, f) = 
+	\left\{\begin{array}{cl}
+		\frac{\norm{ m}^2}{f} &\text{if } f>0, \\
+		0 &\text{if } (m,  f) = (0,0), \\
+		+\infty &\text{otherwise}.\end{array}\right.	
+}
+and the set of linear constraints reads
+\eq{ 
+	\Cinc = \enscond{(m,f)}{ \partial_t f +\diverg_x(m)= 0, 
+      \; m(0,\cdot)=m(1,\cdot)=0, \;  f(\cdot,0)=f^0, \; f(\cdot,1)=f^1  }. 
+}
+
+
+\if 0
+Note that this convex program is challenging because:
+\begin{rs}
+	\item The functional $J$ tends to zero when $f(x,t)$ tends to
+infinity at some points, so that it is not coercive, which makes the
+proof of existence of minimizers non-trivial.
+	\item The functional $J$ tends to infinity when $f(x,t)$ tends to
+zero at some points which makes the use of gradient descent methods impossible
+(its gradient is not Lipschitz). 
+\end{rs}
+\fi

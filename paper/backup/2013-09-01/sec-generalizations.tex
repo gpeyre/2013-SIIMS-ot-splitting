@@ -1,0 +1,116 @@
+\section{Generalized Cost Functions}
+
+
+Following \cite{dolbeault2009,Cardaliaguet2012}, we propose to use a generalized cost function that allows one to compute geodesics that interpolate between the $L^2$-Wasserstein and the $H^{-1}$ geodesics. To introduce further flexibility, we introduce a spacial varying weight.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatially Varying Interpolation between $L^2$-Wasserstein and $H^{-1}$ }\label{sec:generalized_cost}
+
+
+We define our new general finite dimensional convex problem as
+\eql{ \label{eq-optim-bb-gen}
+	\umin{U \in \Es} \Jfunc_\bet^w(\interp(U)) + \iota_\Cinc(U),
+}
+where the vector of weights $w = (w_k)_{k \in \Gc}$ satisfies $c < w_k \leq +\infty$ and  $c>0$ is a small constant. 
+The generalized functional   reads, for $\be \geq 0 $
+\eql{\label{eq:generelized_cost}
+	\Jfunc_\bet^w(V) = \sum_{k \in \Gc} w_k \jfunc_\bet(m_k,f_k), 
+}
+\eql{
+	\foralls (m,  f) \in \RR^d \times \RR, \quad
+	\jfunc_\be(m,f) = 
+	\left\{\begin{array}{cl}
+		\frac{\norm{m}^2}{f^\bet} &\text{if }  f>0, \\
+		0 &\text{if } (m,  f) = (0,0), \\
+		+\infty &\text{otherwise}.
+	\end{array}\right.	
+}
+Note that $\Jfunc_1^1 = \Jfunc$ and that for $\be \in [0,1]$, $\Jfunc_\bet^w$ is convex. 
+Furthermore, one has, for $f>0$  
+\eql{\label{hessian}
+	\det( \partial^2 \jfunc_\be(m,f) ) = \frac{4\bet(1-\bet)\norm{m}^2}{f^{3\bet+2}}.
+}
+This shows that $\jfunc_\be$ is strictly convex on $\RR^{*,d} \times \RR^{+,*}$ for $\be \in ]0,1[$.
+
+When $\be=1$ and the weights $w_k$ are constant in time, the solution of~\eqref{eq:generelized_cost} discretizes the displacement interpolation between the densities $(f^0,f^1)$ for a ground cost being the squared geodesic distance on a Riemannian manifold (see Section~\ref{sec-previous} for more details). Note that we restrict our attention to isotropic Riemannian metrics (being propositional to the identity at each point), but this extends to arbitrary Riemannian or even Finsler metrics.  Studying the properties of this transportation distance is however not the purpose of this work, and we show in Section~\ref{subsec-riemanian-examples} numerical illustrations of the influence of $w$. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing $\prox_{\ga J_\bet}$}
+
+
+The following proposition, which generalizes Proposition~\ref{proposition1}, shows how to compute $\prox_{\ga \Jfunc_\bet^w}$.
+
+\begin{prop}\label{prop-generalized}
+	One has
+	\eq{
+		\foralls V \in \Ec, 
+		\quad \prox_{\ga \Jfunc_\be^w}(V) = ( \prox_{\ga w_k \jfunc_\be}(V_k) )_{k \in \Gc}
+	}
+	where, for all $(\tilde m,\tilde f) \in \RR^d \times \RR$, 
+	\eq{
+		\prox_{\ga \jfunc_\be}(\tilde m,\tilde f) = 
+		\left\{\begin{array}{cl}
+	  		(\mu(f^{\star}),f^\star) &\text{if } f^\star > 0 \text{ and  }\ga< \infty, \\
+		  	(0,0) &\text{otherwise}.\end{array}\right.
+	}
+	\eql{\label{eq:mstar-bis}
+		\qwhereq
+		\foralls f \geq 0, \quad \mu(f) = \frac{f^\bet \tilde m}{f^\bet+2\ga} \in \RR^d
+	}
+	and $f^\star$ is the largest real root of the following equation in $X$
+	\eql{\label{eq:poly_alpha}
+     	P_\bet(X) = X^{1-\bet} (X-\tilde f)(X^\bet+2\ga)^2  - \ga\bet \norm{\tilde m}^2 = 0
+	}
+\end{prop}
+\begin{proof}
+	We denote $(\bar m,\bar f) = \prox_{\ga \jfunc_\be}(\tilde m,\tilde f)$, and
+	\eq{
+		\foralls (m,f) \in \RR^d \times \RR, \quad
+		\Phi_\be(m,f) = \frac{1}{2}\norm{ (m,f) - (\tilde m, \tilde f) }^2 + \ga \jfunc_\be( m,f ).
+	}
+	If $\bar f > 0$, since $\jfunc$ is $C^1$ and is strongly convex on $\RR^{d} \times \RR^{+,*}$, 
+	necessarily $(\bar m,\bar f)$ is the unique solution of $\nabla \Phi_\be(\bar m,\bar f)=0$, which reads
+	\eq{
+		\choice{
+    	  		2 \ga \frac{\bar m}{\bar f^\bet} + \bar m-\tilde m=0 \\
+       		-\ga \bet\frac{\norm{\bar m}^2}{\bar f^{\bet+1}} + \bar f - \tilde f = 0.
+     	}
+	}
+	Reformulating these equations leads to the following equivalent conditions
+	\eq{
+		P_\be(\bar f) = 0
+		\qandq
+		\bar m = \mu_\be(\bar f).
+	}
+	This shows that if $P_\be$ as at least a strictly positive real root $f^\star$, it is necessarily unique and that $(\bar f=f^\star,\bar m=\mu_\be(f^\star))$. Otherwise, necessarily $(\bar f = 0, \bar m = 0)$.
+\end{proof}
+
+Note that when $\be=p/q \in \QQ$ is a rational number, equation $P_\be(X)=0$ corresponds to finding the root of a polynomial. It can be solved efficiently using a few Newton descent iterations starting from a large enough value of $f$.
+
+	% JE pense que c'est encore strictement convexe pour m=0, non ?	
+	% Gabriel : pas compris ce qui suit. 
+%	In the case $\tilde m=0$, there are potentially two positive real roots $\{0,f^\star\}$. Nevertheless, as $\tilde m=0$, then we have $m=0$ so that $\frac{\norm{m}^2}{f^{\bet+1}} =0$ for all $f$. Hence, we deduce that $f$ is simply the projection of $\tilde f$ on the set of positive numbers which is equivalent to project the largest real root onto $\RR^+$.
+
+
+
+%%
+%\paragraph{The case $\bet\in\QQ^+$}
+%Exact estimation of $f^*$ can be found by considering irreducible fractions $\bet=\frac{k}p\in\QQ^+$,  with $p$ and $k$ integers such that $p\geq k>0$.
+%Let us denote $\tilde f= f^{1/p}$, we have that $f=\tilde f^p$ and $f ^\bet=\tilde f^k$.
+%The relation (\ref{eq:poly_alpha}) can be rewritten as:
+%\eq{
+%\tilde f^{p-k} (\tilde f^p-f_0)(\tilde f^k+2\ga)^2  - \frac{\ga k\norm{m_0}^2}p   = 0,
+%}
+%which gives the following polynomial of degree $2k+p$ that can be solved exactly:
+%\begin{equation}\label{eq:poly_kp}
+%\tilde f^{2p+k}+4\ga \tilde f^{2p}+4\ga^2 \tilde f^{2p-k}- f_0 \tilde f^{p+k}-4\ga f_0 \tilde f^{p}-4\ga^2 f_0\tilde f^{p-k}  - \frac{\ga k\norm{m_0}^2}p= 0.
+%\end{equation}
+%where we recover (\ref{eq:polynome3}) for $k=p=1$.  
+%In the case $\bet=\frac12$, we have:
+%\eq{
+%	\tilde f^{5}+4\ga \tilde f^{4}+(4\ga^2- f_0 ) \tilde f^3-4\ga f_0 \tilde f^{2}-4\ga^2 f_0\tilde f  - \frac{\ga \norm{m_0}^2}2= 0.
+%}
+

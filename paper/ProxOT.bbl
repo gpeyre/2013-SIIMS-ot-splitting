@@ -1,0 +1,460 @@
+\begin{thebibliography}{10}
+
+\bibitem{Carlier_wasserstein_barycenter}
+M.~Agueh and G.~Carlier.
+\newblock Barycenters in the {W}asserstein space.
+\newblock {\em SIAM Journal on Mathematical Analysis}, 43(2):904--924, 2011.
+
+\bibitem{anderson-cfd}
+J.~Anderson.
+\newblock {\em {Computational Fluid Dynamics}}.
+\newblock McGraw-Hill Science/Engineering/ Math, 1995.
+
+\bibitem{Angenent2003}
+S.~Angenent, S.~Haker, and A.~Tannenbaum.
+\newblock Minimizing flows for the {M}onge-{K}antorovich problem.
+\newblock {\em SIAM Journal on Mathematical Analysis}, 35(1):61--97, 2003.
+
+\bibitem{Arrow1958}
+K.J. Arrow, L.~Hurwicz, and H.~Uzawa.
+\newblock {\em Studies in linear and non-linear programming}.
+\newblock Stanford University Press, 1958.
+
+\bibitem{Benamou-Semigeostrophic}
+J.~Benamou and Y.~Brenier.
+\newblock Weak existence for the semigeostrophic equations formulated as a
+  coupled {M}onge--{A}mpere/transport problem.
+\newblock {\em SIAM Journal on Applied Mathematics}, 58(5):1450--1461, 1998.
+
+\bibitem{Benamou1995}
+J.-D. Benamou.
+\newblock A domain decomposition method for the polar factorization of
+  vector-valued mappings.
+\newblock {\em SIAM Journal on Numerical Analysis}, 32(6):1808--1838, 1995.
+
+\bibitem{Benamou2010}
+J.-D. Benamou.
+\newblock Numerical resolution of an ``unbalanced'' mass transport problem.
+\newblock {\em ESAIM: Mathematical Modelling and Numerical Analysis},
+  37(5):851--868, 2010.
+
+\bibitem{Benamou2000}
+J.-D. Benamou and Y.~Brenier.
+\newblock A computational fluid mechanics solution of the {M}onge-{K}antorovich
+  mass transfer problem.
+\newblock {\em Numerische Mathematik}, 84(3):375--393, 2000.
+
+\bibitem{Benamou2001}
+J.-D. Benamou and Y.~Brenier.
+\newblock Wasserstein optimal mapping between prescribed densities functions.
+\newblock {\em Journal of Optimization Theory and Applications},
+  111(2):255--271, 2001.
+
+\bibitem{Benamou2012}
+J.-D. Benamou, B.~D. Froese, and Oberman~A. M.
+\newblock Numerical solution of the optimal transportation problem via
+  viscosity solutions for the {M}onge-{A}mpere equation.
+\newblock {\em CoRR}, abs/1208.4873, 2012.
+
+\bibitem{Bertsekas1988}
+D.P. Bertsekas.
+\newblock The auction algorithm: A distributed relaxation method for the
+  assignment problem.
+\newblock {\em Annals of Operations Research}, 14:105--123, 1988.
+
+\bibitem{Blum2009}
+J.~Blum, F-X. Le~Dimet, and I.~M. Navon.
+\newblock Data assimilation for geophysical fluids.
+\newblock In {\em {Computational Methods for the Atmosphere and then Oceans}},
+  volume~14, pages 385--442. Elsevier, 2009.
+
+\bibitem{Bonneel-displacement}
+N.~Bonneel, M.~{van de Panne}, S.~Paris, and W.~Heidrich.
+\newblock Displacement interpolation using {L}agrangian mass transport.
+\newblock {\em ACM Transactions on Graphics (Proceedings of SIGGRAPH Asia
+  2011)}, 30(6), 2011.
+
+\bibitem{bornemann-fm}
+F.~Bornemann and C.~Rasch.
+\newblock Finite-element discretization of static hamilton-jacobi equations
+  based on a local variational principle.
+\newblock {\em Comput. Visual Sci.}, 9(2):57--69, 2006.
+
+\bibitem{BoydADMM}
+S.~Boyd, B.~Parikh, E.~Chu, B.~Peleato, and J.~Eckstein.
+\newblock Distributed optimization and statistical learning via the alternating
+  direction method of multipliers.
+\newblock {\em Found. Trends Mach. Learn.}, 3(1):1--122, January 2011.
+
+\bibitem{Brenier1991}
+Y.~Brenier.
+\newblock Polar factorization and monotone rearrangement of vector-valued
+  functions.
+\newblock {\em Communications on Pure and Applied Mathematics}, 44(4):375--417,
+  1991.
+
+\bibitem{Briceno-Arias-PD}
+L.~M. Brice{\~n}o-Arias and P.~L. Combettes.
+\newblock A monotone+skew splitting model for composite monotone inclusions in
+  duality.
+\newblock {\em SIAM Journal on Optimization}, 21(4):1230--1250, 2011.
+
+\bibitem{Burger2011}
+M.~Burger, M.~Franek, and C.-B. Sch\"onlieb.
+\newblock Regularized regression and density estimation based on optimal
+  transport.
+\newblock {\em Applied Mathematics Research eXpress}, 2011.
+
+\bibitem{Burkard09}
+R.~Burkard, M.~Dell'Amico, and S.~Martello.
+\newblock {\em Assignment Problems}.
+\newblock Society for Industrial and Applied Mathematics, Philadelphia, PA,
+  USA, 2009.
+
+\bibitem{Cardaliaguet2012}
+P.~Cardaliaguet, G.~Carlier, and B.~Nazaret.
+\newblock Geodesics for a class of distances in the space of probability
+  measures.
+\newblock {\em Calculus of Variations and Partial Differential Equations},
+  pages 1--26, 2012.
+
+\bibitem{Carrillo-diffusive}
+J.~Carrillo and J.~Moll.
+\newblock Numerical simulation of diffusive and aggregation phenomena in
+  nonlinear continuity equations by evolving diffeomorphisms.
+\newblock {\em SIAM Journal on Scientific Computing}, 31(6):4305--4329, 2010.
+
+\bibitem{Chambolle2011}
+A.~Chambolle and T.~Pock.
+\newblock A first-order primal-dual algorithm for convex problems with
+  applications to imaging.
+\newblock {\em Journal of Mathematical Imaging and Vision}, 40(1):120--145,
+  2011.
+
+\bibitem{Clarysse2010}
+P.~Clarysse, B.~Delhay, M.~Picq, and J.~Pousin.
+\newblock Optimal extended optical flow subject to a statistical constraint.
+\newblock {\em Journal of Computational and Applied Mathematics},
+  234(4):1291--1302, 2010.
+
+\bibitem{CombettesPesquet-PPXA}
+P.~L. Combettes and J.-C. Pesquet.
+\newblock A proximal decomposition method for solving convex variational
+  inverse problems.
+\newblock {\em Inverse Problems}, 24(6):065014, 2011.
+
+\bibitem{Combettes2007}
+P.L. Combettes and J.-C. Pesquet.
+\newblock A {D}ouglas-{R}achford splitting approach to nonsmooth convex
+  variational signal recovery.
+\newblock {\em IEEE Journal of Selected Topics in Signal Processing}, 1(4):564
+  --574, 2007.
+
+\bibitem{combettes-pesquet-review}
+P.L. {C}ombettes and J-C. {P}esquet.
+\newblock {P}roximal splitting methods in signal processing.
+\newblock In {\em {F}ixed-{P}oint {A}lgorithms for {I}nverse {P}roblems in
+  {S}cience and {E}ngineering}, pages 185--212. {S}pringer, 2011.
+
+\bibitem{CorderoErausquin-sobolev}
+D.~Cordero-Erausquin, B.~Nazaret, and C.~Villani.
+\newblock A mass-transportation approach to sharp {S}obolev and
+  {G}agliardo-{N}irenberg inequalities.
+\newblock {\em Advances in Mathematics}, 182(2):307--332, 2004.
+
+\bibitem{Dantzig-Book}
+G.~B. Dantzig.
+\newblock {\em Linear Programming and Extensions}.
+\newblock Princeton University Press, Princeton, NJ, 1963.
+
+\bibitem{deGoes2011}
+F.~de~Goes, D.~Cohen-Steiner, P.~Alliez, and M.~Desbrun.
+\newblock An optimal transport approach to robust reconstruction and
+  simplification of {2D} shapes.
+\newblock {\em Computer Graphics Forum}, 30(5):1593--1602, 2011.
+
+\bibitem{Dean-Glowinski-2006}
+E.~J. Dean and R.~Glowinski.
+\newblock An augmented {L}agrangian approach to the numerical solution of the
+  dirichlet problem for the elliptic {M}onge-{A}mp\`ere equation in two
+  dimensions.
+\newblock {\em Electron. Trans. Numer. Anal.}, 22:71--96, 2006.
+
+\bibitem{Delon-midway}
+J.~Delon.
+\newblock Movie and video scale-time equalization application to flicker
+  reduction.
+\newblock {\em IEEE Transactions on Image Processing}, 15(1):241--248, 2006.
+
+\bibitem{delon-circle}
+J.~Delon, J.~Salomon, and A.~Sobolevski.
+\newblock Fast transport optimization for {M}onge costs on the circle.
+\newblock {\em SIAM Journal on Applied Mathematics}, 70(7):2239--2258, 2010.
+
+\bibitem{delon-concave}
+J.~{Delon}, J.~{Salomon}, and A.~{Sobolevskii}.
+\newblock Local matching indicators for transport problems with concave costs.
+\newblock {\em SIAM Journal on Discrete Mathematics}, 26(2):801--827, 2012.
+
+\bibitem{digne-reconstruction}
+J.~Digne, D.~Cohen-Steiner, P.~Alliez, F.~Goes, and M.~Desbrun.
+\newblock Feature-preserving surface reconstruction and simplification from
+  defect-laden point sets.
+\newblock {\em Journal of Mathematical Imaging and Vision}, pages 1--14, 2013.
+
+\bibitem{dolbeault2009}
+J.~Dolbeault, B.~Nazaret, and G.~Savar{\'e}.
+\newblock A new class of transport distances between measures.
+\newblock {\em Calculus of Variations and Partial Differential Equations},
+  34(2):193--231, 2009.
+
+\bibitem{During-gradient-flow}
+B.~During, D.~Matthes, and J.P. Milisic.
+\newblock A gradient flow scheme for nonlinear fourth order equations.
+\newblock {\em Discrete and Continuous Dynamical Systems - Series B},
+  14(3):935--959, 2010.
+
+\bibitem{Eckstein1992}
+J.~Eckstein and D.~P. Bertsekas.
+\newblock On the {D}ouglas-{R}achford splitting method and the proximal point
+  algorithm for maximal monotone operators.
+\newblock {\em Mathematical Programming}, 55:293--318, 1992.
+
+\bibitem{Feng-Neilan-2009}
+X.~Feng and M.~Neilan.
+\newblock Mixed finite element methods for the fully non- linear
+  {M}onge-{A}mp\`ere equation based on the vanishing moment method.
+\newblock {\em SIAM Journal on Numerical Analysis}, 2(47):1226--1250, 2009.
+
+\bibitem{2013-ssvm-mixing}
+S.~Ferradans, G-S. Xia, G.~Peyr{\'e}, and J-F. Aujol.
+\newblock Static and dynamic texture mixing using optimal transport.
+\newblock In {\em Proc. SSVM'13}, volume 7893 of {\em Lecture Notes in Computer
+  Science}, pages 137--148. Springer Berlin Heidelberg, 2013.
+
+\bibitem{Ferragut-mixed-fem}
+L.~Ferragut and I.~Asensio.
+\newblock Mixed finite element methods for a class of nonlinear reaction
+  diffusion problems.
+\newblock {\em Neural, Parallel Sci. Comput.}, 10(1):91--112, 2002.
+
+\bibitem{Fortin1983}
+M.~Fortin and R.~Glowinski.
+\newblock {\em Augmented {L}agrangian Methods: Applications to the Numerical
+  Solution of Boundary-Value Problems}.
+\newblock Elsevier Science, 1983.
+
+\bibitem{Frisch-nature}
+U.~Frisch, s.~Matarrese, R.~Mohayaee, and A.~Sobolevski.
+\newblock A reconstruction of the initial conditions of the universe by optimal
+  mass transportation.
+\newblock {\em Nature}, 417:260?--262, 2002.
+
+\bibitem{Froese2012}
+B.~D. Froese.
+\newblock A numerical method for the elliptic {M}onge-{A}mp\`ere equation with
+  transport boundary conditions.
+\newblock {\em SIAM Journal on Scientific Computing}, 34(3):A1432--A1459, 2012.
+
+\bibitem{Gabay83}
+D.~Gabay.
+\newblock {Applications of the method of multipliers to variational
+  inequalities}.
+\newblock In M.~Fortin and R.~Glowinski, editors, {\em Augmented {L}agrangian
+  Methods: Applications to the Solution of Boundary Value Problems},
+  chapter~IX, pages 299--340. North-Holland, Amsterdam, 1983.
+
+\bibitem{GabayMercier}
+D.~Gabay and B.~Mercier.
+\newblock A dual algorithm for the solution of nonlinear variational problems
+  via finite element approximation.
+\newblock {\em Computers \& Mathematics with Applications}, 2(1):17--40, 1976.
+
+\bibitem{GlowinskiMarroco}
+R.~Glowinski and A.~Marroco.
+\newblock Sur l'approximation, par éléments finis d'ordre un, et la résolution,
+  par pénalisation-dualité d'une classe de problèmes de dirichlet non
+  linéaires.
+\newblock {\em ESAIM: Mathematical Modelling and Numerical Analysis -
+  Modélisation Mathématique et Analyse Numérique}, 9(R2):41--76, 1975.
+
+\bibitem{Kuhn-hungarian}
+{H. W. Kuhn}.
+\newblock The {Hungarian} method of solving the assignment problem.
+\newblock {\em Naval Res. Logistics Quart.}, 2:83--97, 1955.
+
+\bibitem{Haber2010}
+E.~Haber, T.~Rehman, and A.~Tannenbaum.
+\newblock An efficient numerical method for the solution of the $l_2$ optimal
+  mass transfer problem.
+\newblock {\em SIAM Journal on Scientific Computing}, 32(1):197--211, 2010.
+
+\bibitem{haker-ijcv}
+S.~Haker, L.~Zhu, A.~Tannenbaum, and S.~Angenent.
+\newblock Optimal mass transport for registration and warping.
+\newblock {\em International Journal of Computer Vision}, 60(3):225--240,
+  December 2004.
+
+\bibitem{Harlow1965}
+F.~H. Harlow and J.~E. Welch.
+\newblock Numerical calculation of time-dependent viscous incompressible flow
+  of fluid with free surface.
+\newblock {\em Physics of Fluids}, 8(12):2182--2189, 1965.
+
+\bibitem{Iollo2011}
+A.~Iollo and D.~Lombardi.
+\newblock A {L}agrangian scheme for the solution of the optimal mass transfer
+  problem.
+\newblock {\em Journal of Computational Physics}, 230(9):3430--3442, 2011.
+
+\bibitem{jko}
+R.~Jordan, D.~Kinderlehrer, and F.~Otto.
+\newblock The variational formulation of the {F}okker--{P}lanck equation.
+\newblock {\em SIAM Journal on Mathematical Analysis}, 29(1):1--17, 1998.
+
+\bibitem{KimPass-MultiMarg-Manifold}
+Y-H. Kim and B.~Pass.
+\newblock Multi-marginal optimal transport on {R}iemannian manifolds.
+\newblock Technical report, Preprint arXiv:1303.6251, 2013.
+
+\bibitem{sethian-geodesic-path}
+R.~Kimmel and J.A. Sethian.
+\newblock Computing geodesic paths on manifolds.
+\newblock {\em Proc. of the National Academy of Sciences}, 95(15):8431--8435,
+  1998.
+
+\bibitem{Ling2007}
+H.~Ling and K.~Okada.
+\newblock An efficient earth mover's distance algorithm for robust histogram
+  comparison.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  29(5):840--853, 2007.
+
+\bibitem{Lions-Mercier-DR}
+P.~L. Lions and B.~Mercier.
+\newblock Splitting algorithms for the sum of two nonlinear operators.
+\newblock {\em Siam J. Numer. Anal.}, 16:964--979, 1979.
+
+\bibitem{mccann1997convexity}
+R.~J. McCann.
+\newblock A convexity principle for interacting gases.
+\newblock {\em advances in mathematics}, 128(1):153--179, 1997.
+
+\bibitem{McCann-PolarManifold}
+R.J. McCann.
+\newblock Polar factorization of maps on {R}iemannian manifolds.
+\newblock {\em Geometric \& Functional Analysis}, 11(3):589--608, 2001.
+
+\bibitem{Merigot2011}
+Q.~M\'erigot.
+\newblock A multiscale approach to optimal transport.
+\newblock {\em Computer Graphics Forum}, 30(5):1583--1592, 2011.
+
+\bibitem{Moreau1965}
+J.J. Moreau.
+\newblock Proximit\'e et dualit\'e dans un espace hilbertien.
+\newblock {\em Bulletin de la Société Mathématique de France}, 93:273--299,
+  1965.
+
+\bibitem{Nesterov-Nemirovsky-Book}
+Y.~E. Nesterov and A.~S. Nemirovsky.
+\newblock {\em Interior Point Polynomial Methods in Convex Programming~: Theory
+  and Algorithms}.
+\newblock SIAM Publishing, 1993.
+
+\bibitem{Oberman-2008}
+A.~M. Oberman.
+\newblock Wide stencil finite difference schemes for the elliptic
+  {M}onge-{A}mpere equation and functions of the eigenvalues of the hessian.
+\newblock {\em Discrete and Continuous Dynamical Systems - Series B},
+  1(10):221--238, 2008.
+
+\bibitem{Oliker-Prussner-1988}
+V.~I. Oliker and L.~D. Prussner.
+\newblock On the numerical solution of the equation $\frac{\partial^2
+  z}{\partial x^2} \frac{\partial^2 z}{\partial y^2} - \left(\frac{\partial^2
+  z}{\partial x \partial y} \right)^2 = f$ and its discretizations.
+\newblock {\em Numerische Mathematik}, 3(54):271--293, 1988.
+
+\bibitem{Papadakis-colors}
+N.~Papadakis, E.~Provenzi, and V.~Caselles.
+\newblock A variational model for histogram transfer of color images.
+\newblock {\em Image Processing, IEEE Transactions on}, 20(6):1682--1695, 2011.
+
+\bibitem{Pele-ICCV}
+O.~Pele and M.~Werman.
+\newblock Fast and robust earth mover's distances.
+\newblock In {\em IEEE International Conference on Computer Vision}, ICCV'09,
+  pages 460--467, 2009.
+
+\bibitem{Pustelnik-PPXA}
+N.~Pustelnik, C.~Chaux, and J.~Pesquet.
+\newblock Parallel proximal algorithm for image restoration using hybrid
+  regularization.
+\newblock {\em IEEE Transactions on Image Processing}, 20(9):2450--2462, 2011.
+
+\bibitem{Rabin2011}
+J.~Rabin and G.~Peyr\'e.
+\newblock Wasserstein regularization of imaging problem.
+\newblock In {\em IEEE International Conference on Image Processing (ICIP'11)},
+  pages 1541--1544, 2011.
+
+\bibitem{Rabin_ssvm11}
+J.~Rabin, G.~Peyr\'{e}, J.~Delon, and M.~Bernot.
+\newblock Wasserstein barycenter and its application to texture mixing.
+\newblock In {\em Scale Space and Variational Methods in Computer Vision
+  (SSVM'11)}, volume 6667, pages 435--446, 2011.
+
+\bibitem{Rubner1998}
+Y.~Rubner, C.~Tomasi, and L.J. Guibas.
+\newblock A metric for distributions with applications to image databases.
+\newblock In {\em IEEE International Conference on Computer Vision (ICCV'98)},
+  pages 59--66, 1998.
+
+\bibitem{sethianFM1995}
+J.~A. Sethian.
+\newblock A fast marching level set method for monotonically advancing fronts.
+\newblock {\em Proc. of the National Academy of Sciences}, 93(4):1591--1595,
+  1996.
+
+\bibitem{Shirdhonkar2008}
+S.~Shirdhonkar and D.W. Jacobs.
+\newblock Approximate earth mover's distance in linear time.
+\newblock In {\em IEEE Conference on Computer Vision and Pattern Recognition
+  (CVPR'08)}, pages 1--8, 2008.
+
+\bibitem{Spingarn85}
+J.E. Spingarn.
+\newblock Applications of the method of partial inverses to convex programming:
+  Decomposition.
+\newblock {\em Mathematical Programming}, 32(2):199--223, 1985.
+
+\bibitem{Strang1988}
+G.~Strang.
+\newblock {\em Linear Algebra and Its Applications}.
+\newblock Brooks Cole, 1988.
+
+\bibitem{Sulman2011b}
+M.~Sulman, J.~F. Williams, and R.~D. Russell.
+\newblock Optimal mass transport for higher dimensional adaptive grid
+  generation.
+\newblock {\em Journal of Computational Physics}, 230(9):3302--3330, 2011.
+
+\bibitem{tsitsiklis-TAC}
+J.~Tsitsiklis.
+\newblock Efficient algorithms for globally optimal trajectories.
+\newblock {\em IEEE Trans. on Automatic Control}, 40(9):1528--1538, Step. 1995.
+
+\bibitem{Villani03}
+C.~Villani.
+\newblock {\em Topics in Optimal Transportation}.
+\newblock Graduate Studies in Mathematics Series. American Mathematical
+  Society, 2003.
+
+\bibitem{Villani-OldNew}
+C.~Villani.
+\newblock {\em Optimal Transport: Old and New}.
+\newblock Grundlehren der mathematischen Wissenschaften. Springer, November
+  2008.
+
+\end{thebibliography}
